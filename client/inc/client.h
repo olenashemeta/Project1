@@ -8,5 +8,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <gtk/gtk.h>
+
+void mx_connect_to_server(GtkLabel *label);
 
 #endif

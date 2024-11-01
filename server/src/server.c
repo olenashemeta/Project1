@@ -47,6 +47,9 @@ int main(void) {
     send(server_socket, response, strlen(response), 0);
     printf("Response sent to client\n");
 
+    while(1) {
+
+    }
 
     close(server_socket);
     close(server_fd);
