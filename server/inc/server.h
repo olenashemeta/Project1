@@ -1,6 +1,8 @@
 #ifndef SERVER_H
 #define SERVER_H
 
+#define DB_NAME "test.db"
+
 #include "../lib/libmx/inc/libmx.h"
 
 #include <stdio.h>
@@ -63,6 +65,32 @@ void db_user_update(t_user* user);
 t_user* db_user_read_by_id(int id);
 t_list* db_user_read_all();
 
+//Messages CRUD
+int db_message_create(t_message* message);
+void db_message_delete(t_message* message);
+void db_message_delete_by_id(int id);
+void db_message_delete_by_named_field(const char* field, const char* value);
+void db_message_update(t_message* message);
+t_message* db_message_read_by_id(int id);
+t_list* db_message_read_all();
+t_list* db_message_read_by_sender_id(int id);
+t_list* db_message_read_by_group_id(int id);
+
+//Groups CRUD
+int db_group_create(t_group* group);
+void db_group_delete(t_group* group);
+void db_group_delete_by_id(int id);
+void db_group_delete_by_named_field(const char* field, const char* value);
+void db_group_update(t_group* group);
+t_group* db_group_read_by_id(int id);
+t_list* db_group_read_all();
+
+//Users-Groups CRUD
+t_list* db_user_read_by_group_id(int id);
+t_list* db_group_read_by_user_id(int id);
+int db_user_add_to_group(int user_id, int group_id);
+void db_user_remove_from_froup(int user_id, int group_id);
+
 //Error handling
 void validate_database_operation(int rc, sqlite3* db, char* error);
 
@@ -72,5 +100,17 @@ t_user* user_from_data_list(t_list* list);
 t_list* user_list_from_data_list(t_list* list);
 void free_user(t_user** user);
 void free_user_list(t_list* list);
+
+t_message* message_create(int sent_by, const char* text, int group_id);
+t_message* message_from_data_list(t_list* list);
+t_list* message_list_from_data_list(t_list* list);
+void free_message(t_message** message);
+void free_message_list(t_list* list);
+
+t_group* group_from_data_list(t_list* list);
+t_group* group_create(const char* name, int created_by);
+t_list* group_list_from_data_list(t_list* list);
+void free_group(t_group** group);
+void free_group_list(t_list* list);
 
 #endif 

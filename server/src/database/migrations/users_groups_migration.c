@@ -15,7 +15,8 @@ void users_groups_migration_up() {
         "user_id INTEGER NOT NULL,"
         "group_id INTEGER NOT NULL,"
         "FOREIGN KEY(user_id) REFERENCES users(id),"
-        "FOREIGN KEY(group_id) REFERENCES groups(id))"
+        "FOREIGN KEY(group_id) REFERENCES groups(id),"
+        "CONSTRAINT UC_users_groups UNIQUE (user_id, group_id))"
         , 0, 0, &error);
     validate_database_operation(rc, db, error);
 
