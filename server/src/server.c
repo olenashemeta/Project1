@@ -1,13 +1,21 @@
 #include "../inc/server.h"
 
+void *handle_client(void *arg) {
+    t_client *client = (t_client *)arg;
+    syslog(LOG_INFO, "Client connected with ID: %d", client->client_id);
+
+    close(client->socket_fd);
+    free(client);
+    pthread_exit(NULL);
+}
+
 int main(void) {
     int server_fd, server_socket;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
+    mx_daemon_start();
+    set_signal();
     
-    char buffer[1024] = {0};
-    char *response = "Hello from server";
-
     server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd == 0) {
         perror("socket failed");
@@ -31,24 +39,28 @@ int main(void) {
     }
 
     printf("Server listening on port 8080\n");
-
-    server_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
-    if (server_socket < 0) {
-        perror("accept");
-        close(server_fd);
-        exit(EXIT_FAILURE);
-    }
-
-    printf("Connection accepted\n");
-
-    read(server_socket, buffer, 1024);
-    printf("Received from client: %s\n", buffer);
-
-    send(server_socket, response, strlen(response), 0);
-    printf("Response sent to client\n");
-
+    int id = 1;
     while(1) {
+        t_client *client = malloc(sizeof(t_client));
 
+        client->socket_fd = accept(server_fd, (struct sockaddr *)&client->address, (socklen_t*)&addrlen);
+        if (client->socket_fd < 0) {
+            perror("accept");
+            free(client);
+            continue;
+        }
+
+        client->client_id = id++;
+
+        pthread_t client_thread;
+        if (pthread_create(&client_thread, NULL, handle_client, (void *)client) != 0) {
+            perror("pthread_create failed");
+            close(client->socket_fd);
+            free(client);
+            continue;
+        }
+
+        pthread_detach(client_thread);
     }
 
     close(server_socket);
