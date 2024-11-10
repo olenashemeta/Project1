@@ -2,7 +2,14 @@
     "files.associations": {
         "client.h": "c",
         "errno.h": "c",
-        "signal.h": "c"
+        "signal.h": "c",
+        "inet.h": "c",
+        "stdio.h": "c",
+        "stdlib.h": "c",
+        "bio.h": "c",
+        "json.h": "c",
+        "cjson.h": "c",
+        "libmx.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
