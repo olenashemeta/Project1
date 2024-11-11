@@ -81,7 +81,15 @@ void *handle_client(void *arg) {
     pthread_exit(NULL);
 }
 
-int main(void) {
+int main(int argc, char **argv) {
+    if(argc == 2 && mx_strcmp("migration_down", argv[1]) == 0) {
+        migration_down();
+    }
+    else {
+        migration_up();
+    }
+
+
     int server_fd, server_socket;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
