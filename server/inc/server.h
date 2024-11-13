@@ -52,6 +52,7 @@ typedef struct s_group {
 	int created_by;
 	char* creator_username;
 	char* created_at;
+	char* last_message_date;
 } t_group;
 
 //Migrations

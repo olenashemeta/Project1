@@ -1,21 +1,24 @@
 #include "../../inc/server.h"
 
-t_group* group_from_data_list(t_list* list)
+t_message* message_from_data_list(t_list* list)
 {
-	if (mx_list_size(list) < 5)return NULL;
+	if (mx_list_size(list) < 6)return NULL;
 
-	t_group* ret = (t_group*)malloc(sizeof(t_group));
+	t_message* ret = (t_message*)malloc(sizeof(t_message));
 
 	ret->id = mx_atoi((char*)list->data);
 
 	list = list->next;
-	ret->name = (char*)list->data;
+	ret->sent_by = mx_atoi((char*)list->data);
 
 	list = list->next;
-	ret->created_by = mx_atoi((char*)list->data);
+	ret->sender_username = (char*)list->data;
 
 	list = list->next;
-	ret->creator_username = (char*)list->data;
+	ret->text = (char*)list->data;
+
+	list = list->next;
+	ret->group_id = mx_atoi((char*)list->data);
 
 	list = list->next;
 	ret->created_at = (char*)list->data;
@@ -23,50 +26,55 @@ t_group* group_from_data_list(t_list* list)
 	return ret;
 }
 
-t_group* group_create(const char* name, int created_by)
+t_message* message_create(int sent_by, const char* text, int group_id)
 {
-	t_group* ret = (t_group*)malloc(sizeof(t_group));
+	t_message* ret = (t_message*)malloc(sizeof(t_message));
 
 	ret->id = 0;
 
-	ret->name = mx_strdup(name);
+	ret->sent_by = sent_by;
 
-	ret->created_by = created_by;
+	ret->sender_username = NULL;
 
-	ret->creator_username = NULL;
+	ret->text = mx_strdup(text);
+
+	ret->group_id = group_id;
 
 	ret->created_at = NULL;
 
 	return ret;
 }
 
-t_list* group_list_from_data_list(t_list* list)
+t_list* message_list_from_data_list(t_list* list)
 {
-	int size = mx_list_size(list) / 5;
+	int size = mx_list_size(list) / 6;
 	if (size < 1) return NULL;
 	t_list* ret = NULL;
 
 	for (int i = 0; i < size; i++)
 	{
-		t_group* g = (t_group*)malloc(sizeof(t_group));
+		t_message* m = (t_message*)malloc(sizeof(t_message));
 
-		g->id = mx_atoi((char*)list->data);
-
-		list = list->next;
-		g->name = (char*)list->data;
+		m->id = mx_atoi((char*)list->data);
 
 		list = list->next;
-		g->created_by = mx_atoi((char*)list->data);
+		m->sent_by = mx_atoi((char*)list->data);
 
 		list = list->next;
-		g->creator_username = (char*)list->data;
+		m->sender_username = (char*)list->data;
 
 		list = list->next;
-		g->created_at = (char*)list->data;
+		m->text = (char*)list->data;
+
+		list = list->next;
+		m->group_id = mx_atoi((char*)list->data);
+
+		list = list->next;
+		m->created_at = (char*)list->data;
 
 		list = list->next;
 
-		mx_push_back(&ret, g);
+		mx_push_back(&ret, m);
 	}
 
 	return ret;
