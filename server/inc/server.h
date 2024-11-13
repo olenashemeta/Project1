@@ -7,6 +7,7 @@
 
 #include "../../libs/libmx/inc/libmx.h"
 #include "../../libs/JsonLib/cJSON.h"
+#include "../../libs/Sqlite3Lib/sqlite3.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,7 +21,6 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/pem.h>
-#include <sqlite3.h>
 
 typedef struct s_client {
     int client_id;

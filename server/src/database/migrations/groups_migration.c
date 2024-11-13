@@ -3,7 +3,6 @@
 void groups_migration_up() {
     sqlite3* db;
     char* error = NULL;
-    char* command = NULL;
     int rc = sqlite3_open(DB_NAME, &db);
 
     validate_database_operation(rc, db, NULL);
@@ -25,7 +24,6 @@ void groups_migration_up() {
 void groups_migration_down() {
     sqlite3* db;
     char* error = NULL;
-    char* command = NULL;
     int rc = sqlite3_open(DB_NAME, &db);
 
     validate_database_operation(rc, db, NULL);

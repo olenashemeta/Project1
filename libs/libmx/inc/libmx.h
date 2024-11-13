@@ -82,5 +82,8 @@ void mx_printerr(const char *s);
 int mx_atoi(const char *str);
 bool mx_isalpha(char c);
 
+void mx_del_list(t_list* list, int len);
+void* mx_list_element_at(t_list* list, int idx);
+
 #endif
 

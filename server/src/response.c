@@ -3,7 +3,7 @@
 int mx_hex_to_bytes(const char *hex_str, unsigned char *out_bytes, size_t max_bytes) {
     size_t hex_len = strlen(hex_str);
     if (hex_len % 2 != 0 || hex_len / 2 > max_bytes) {
-        return -1;  // Некоректна довжина або недостатньо місця
+        return -1;
     }
 
     for (size_t i = 0; i < hex_len; i += 2) {

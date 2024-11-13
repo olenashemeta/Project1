@@ -1,15 +1,17 @@
 CC = gcc
-CFLAGS = -Wall -I../libs/libmx/
+CFLAGS = -Wall -I../libs/libmx/ -I../libs/Sqlite3Lib/ -I./src -I./src/database -I./src/database/crud/db_crud -I./src/database/crud/model_crud -I./src/database/migrations -I./src/model_functions
 SRC_DIR = src
 OBJ_DIR = obj
 NAME = server
 
 LIB_DIR = ../libs/JsonLib
 LIB_MX_DIR = ../libs/libmx
-LDFLAGS = -L$(LIB_DIR) -lssl -lcrypto $(LIB_DIR)/libcjson.so.1.7.18 $(LIB_MX_DIR)/libmx.a
-RPATH_FLAGS = -Wl,-rpath=$(LIB_DIR)
+SQLITE_DIR = ../libs/Sqlite3Lib
+LDFLAGS = -L$(LIB_DIR) -L$(LIB_MX_DIR) -L$(SQLITE_DIR) -lssl -lcrypto -lcjson -lmx -lsqlite3 -lm -Wl,-rpath=$(LIB_DIR):$(LIB_MX_DIR):$(SQLITE_DIR)
 
-SRCS = $(wildcard $(SRC_DIR)/*.c)
+SRC_DIRS = $(SRC_DIR) $(SRC_DIR)/database $(SRC_DIR)/database/crud/db_crud $(SRC_DIR)/database/crud/model_crud $(SRC_DIR)/database/migrations $(SRC_DIR)/model_functions
+
+SRCS = $(wildcard $(foreach dir, $(SRC_DIRS), $(dir)/*.c))
 OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
 
 KEY_DIR = .
@@ -19,9 +21,10 @@ PUBLIC_KEY = $(KEY_DIR)/public_key.pem
 all: keys $(NAME)
 
 $(NAME): $(OBJS)
-	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS) $(RPATH_FLAGS)
+	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	@mkdir -p $(dir $@)
 	$(CC) -c $< -o $@ $(CFLAGS)
 
 $(OBJ_DIR):

@@ -2,7 +2,6 @@
 
 t_list* db_user_read_by_group_id(int id) {
 	char* where = NULL;
-	char* from = NULL;
 	asprintf(&where, "users_groups.group_id = %d", id);
 
 	t_list* list = database_read("users.id, users.username, users.login, users.password, users.created_at", "users INNER JOIN users_groups ON users.id = users_groups.user_id", where);
@@ -17,7 +16,6 @@ t_list* db_user_read_by_group_id(int id) {
 
 t_list* db_group_read_by_user_id(int id) {
 	char* where = NULL;
-	char* from = NULL;
 	asprintf(&where, "users_groups.user_id = %d", id);
 
 	t_list* list = database_read("groups.id, groups.name, groups.created_by, users.username, groups.created_at", "groups INNER JOIN users_groups ON groups.id = users_groups.group_id INNER JOIN users on users.id = users_groups.user_id", where);
