@@ -1,6 +1,7 @@
 #include "log_page.h"
 
 void on_submit_account_button_clicked(GtkWidget *button, gpointer data) {
+    int max_size = 1000;
     GtkWidget *vbox = GTK_WIDGET(data);
     (void)vbox;
 
@@ -21,7 +22,17 @@ void on_submit_account_button_clicked(GtkWidget *button, gpointer data) {
     } else {
         gtk_label_set_text(GTK_LABEL(error_label), ""); 
     }
+
+    if (mx_strlen(login) > max_size) {
+        gtk_label_set_text(GTK_LABEL(error_label), "Login must be\n\tless than 1000 characters.");
+        return;
+    }
 	
+    if (mx_strlen(new_password) > max_size) {
+        gtk_label_set_text(GTK_LABEL(error_label), "Password must be\n\tless than 1000 characters.");
+        return;
+    }
+
 	if (mx_strlen(new_password) < 8) {
         gtk_label_set_text(GTK_LABEL(error_label), "Password must be\n\tmore than 8 characters.");
         return;
