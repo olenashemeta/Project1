@@ -56,9 +56,9 @@ void db_group_update(t_group* group)
 
 t_group* db_group_read_by_id(int id) {
 	char* where = NULL;
-	asprintf(&where, "groups.id = %d", id);
+	asprintf(&where, "groups.id = %d GROUP BY groups.id ORDER BY last_message DESC", id);
 
-	t_list* list = database_read("groups.id, groups.name, created_by, users.username, groups.created_at", "groups INNER JOIN users ON created_by = users.id", where);
+	t_list* list = database_read("groups.id, groups.name, groups.created_by, users.username, groups.created_at, max(messages.created_at) as last_message", "groups INNER JOIN users ON groups.created_by = users.id INNER JOIN messages ON groups.id = group_id", where);
 	t_group* ret = group_from_data_list(list);
 
 	mx_del_list(list, mx_list_size(list));
@@ -70,7 +70,7 @@ t_group* db_group_read_by_id(int id) {
 
 t_list* db_group_read_all() {
 
-	t_list* list = database_read("groups.id, groups.name, created_by, users.username, groups.created_at", "groups INNER JOIN users ON created_by = users.id", NULL);
+	t_list* list = database_read("groups.id, groups.name, groups.created_by, users.username, groups.created_at, max(messages.created_at) as last_message", "groups INNER JOIN users ON groups.created_by = users.id INNER JOIN messages ON groups.id = group_id GROUP BY groups.id ORDER BY last_message DESC", NULL);
 	t_list* ret = group_list_from_data_list(list);
 
 	mx_del_list(list, mx_list_size(list));

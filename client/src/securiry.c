@@ -70,7 +70,7 @@ int aes_decrypt(const unsigned char *ciphertext, int ciphertext_len, const unsig
     return plaintext_len;
 }
 
-int encrypt_aes_key(EVP_PKEY *pubkey, unsigned char *aes_key, unsigned char *encrypted_key) {
+int encrypt_aes_key(EVP_PKEY *pubkey, const unsigned char *aes_key, unsigned char *encrypted_key) {
     if (!pubkey || !aes_key || !encrypted_key) {
         fprintf(stderr, "Invalid argument(s) to encrypt_aes_key\n");
         return -1;
@@ -104,21 +104,69 @@ int encrypt_aes_key(EVP_PKEY *pubkey, unsigned char *aes_key, unsigned char *enc
     EVP_PKEY_CTX_free(ctx);
     return (int)encrypted_key_len;
 }
+//
+unsigned char *encrypt_json_with_aes(const unsigned char *aes_key, const unsigned char *iv, cJSON *json, size_t *out_len) {
+    if (!aes_key || !iv || !json || !out_len) {
+        fprintf(stderr, "Invalid argument(s) to encrypt_json_with_aes\n");
+        return NULL;
+    }
 
-/*
-char* base64_encode(const unsigned char *input, int length) {
-    BIO *b64 = BIO_new(BIO_f_base64());
-    BIO *bio = BIO_new(BIO_s_mem());
-    b64 = BIO_push(b64, bio);
-    BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
-    BIO_write(b64, input, length);
-    BIO_flush(b64);
-    BUF_MEM *buffer_ptr;
-    BIO_get_mem_ptr(b64, &buffer_ptr);
-    char *encoded_data = (char *)malloc(buffer_ptr->length + 1);
-    memcpy(encoded_data, buffer_ptr->data, buffer_ptr->length);
-    encoded_data[buffer_ptr->length] = '\0';
-    BIO_free_all(b64);
-    return encoded_data;
+    char *json_string = cJSON_PrintUnformatted(json);
+    if (!json_string) {
+        fprintf(stderr, "Failed to convert JSON to string\n");
+        return NULL;
+    }
+    
+    printf("JSON string to encrypt: %s\n", json_string);
+
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+    if (!ctx) {
+        fprintf(stderr, "Failed to create EVP_CIPHER_CTX\n");
+        free(json_string);
+        return NULL;
+    }
+
+    if (EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, aes_key, iv) != 1) {
+        fprintf(stderr, "EVP_EncryptInit_ex failed\n");
+        EVP_CIPHER_CTX_free(ctx);
+        free(json_string);
+        return NULL;
+    }
+
+    size_t json_len = strlen(json_string);
+    size_t encrypted_data_len = json_len + AES_KEY_SIZE;
+    unsigned char *encrypted_data = (unsigned char *)malloc(encrypted_data_len);
+    if (!encrypted_data) {
+        fprintf(stderr, "Failed to allocate memory for encrypted data\n");
+        EVP_CIPHER_CTX_free(ctx);
+        free(json_string);
+        return NULL;
+    }
+
+    int len = 0;
+    int total_len = 0;
+    if (EVP_EncryptUpdate(ctx, encrypted_data, &len, (unsigned char *)json_string, json_len) != 1) {
+        fprintf(stderr, "EVP_EncryptUpdate failed\n");
+        EVP_CIPHER_CTX_free(ctx);
+        free(json_string);
+        free(encrypted_data);
+        return NULL;
+    }
+    total_len = len;
+
+    if (EVP_EncryptFinal_ex(ctx, encrypted_data + len, &len) != 1) {
+        fprintf(stderr, "EVP_EncryptFinal_ex failed\n");
+        EVP_CIPHER_CTX_free(ctx);
+        free(json_string);
+        free(encrypted_data);
+        return NULL;
+    }
+    total_len += len;
+
+    EVP_CIPHER_CTX_free(ctx);
+    free(json_string);
+
+    *out_len = total_len;
+    return encrypted_data;
 }
-*/
+

@@ -12,59 +12,43 @@ static void on_login_button_clicked(GtkButton *button, gpointer user_data) {
     t_user *user = mx_create_client();
     printf("Created test client:\n");
     mx_print_client(user);
+    
 
-    if (generate_aes_key_iv(main->aes_key, main->aes_iv) != 0) {
-        fprintf(stderr, "Failed to generate AES key and IV\n");
+    //cJSON *login_request = form_login_request_test(main->aes_key, main->aes_iv, user->login, user->password);
+    //if (!login_request) {
+    //    fprintf(stderr, "Failed to create login request JSON\n");
+    //    return;
+    //}
+
+    //size_t encrypted_data_len;
+
+    /*
+    unsigned char *encrypted_data = encrypt_json(main->pubkey, login_request, &encrypted_data_len);
+    if (!encrypted_data) {
+        fprintf(stderr, "Failed to encrypt JSON object\n");
         return;
     }
+    */
+    //unsigned char *encrypted_data = encrypt_json_with_aes(main->aes_key, main->aes_iv, login_request, &encrypted_data_len);
+    //if (!encrypted_data) {
+    //    fprintf(stderr, "Failed to encrypt JSON object\n");
+    //    return;
+    //}
 
-    char aes_key_hex[AES_KEY_SIZE * 2 + 1];
-    char iv_hex[AES_IV_SIZE * 2 + 1];
-    bytes_to_hex_string(main->aes_key, AES_KEY_SIZE, aes_key_hex);
-    bytes_to_hex_string(main->aes_iv, AES_IV_SIZE, iv_hex);
-
-    unsigned char ciphertext[128];
-    int encrypted_len = aes_encrypt((unsigned char *)user->password,
-                                    strlen(user->password),
-                                    main->aes_key, main->aes_iv, ciphertext);
-    if (encrypted_len == -1) {
-        fprintf(stderr, "Password encryption failed\n");
-        return;
+    //printf("Login request JSON: %s\n", encrypted_data);
+    
+    /*
+    uint32_t data_len = htonl((uint32_t)encrypted_data_len);
+    if (send(main->socket, &data_len, sizeof(data_len), 0) == -1) {
+        perror("Failed to send data length to server");
     }
 
-    char encrypted_password_hex[encrypted_len * 2 + 1];
-    bytes_to_hex_string(ciphertext, encrypted_len, encrypted_password_hex);
-
-    unsigned char encrypted_aes_key[256];
-    int encrypted_key_len = encrypt_aes_key(main->pubkey, main->aes_key, encrypted_aes_key);
-    if (encrypted_key_len == -1) {
-        fprintf(stderr, "AES key encryption failed\n");
-        return;
+    if (send(main->socket, encrypted_data, encrypted_data_len, 0) == -1) {
+        perror("Failed to send encrypted data to server");
     }
-
-    char encrypted_aes_key_hex[encrypted_key_len * 2 + 1];
-    bytes_to_hex_string(encrypted_aes_key, encrypted_key_len, encrypted_aes_key_hex);
-
-    cJSON *login_request = form_login_request(user->login, ciphertext, encrypted_len, encrypted_aes_key, encrypted_key_len, main->aes_iv);
-    if (!login_request) {
-        fprintf(stderr, "Failed to create login request JSON\n");
-        return;
-    }
-    char *json_str = cJSON_PrintUnformatted(login_request);
-    if (!json_str) {
-        fprintf(stderr, "Failed to print JSON\n");
-        cJSON_Delete(login_request);
-        return;
-    }
-
-    printf("Login request JSON: %s\n", json_str);
-
-    if (send(main->socket, json_str, strlen(json_str), 0) == -1) {
-        perror("Failed to send login request to server");
-    }
-
-    free(json_str);
-    cJSON_Delete(login_request);
+    */
+    //free(encrypted_data);
+    //cJSON_Delete(login_request);
     mx_free_client(user);
 }
  

@@ -25,6 +25,8 @@
 typedef struct s_client {
     int client_id;
     int socket_fd;
+	unsigned char aes_key[AES_KEY_SIZE];
+    unsigned char aes_iv[AES_IV_SIZE];
     struct sockaddr_in address;
 }              t_client;
 
@@ -52,6 +54,7 @@ typedef struct s_group {
 	int created_by;
 	char* creator_username;
 	char* created_at;
+	char* last_message_date;
 } t_group;
 
 //Migrations
@@ -130,15 +133,28 @@ void free_group(t_group** group);
 void free_group_list(t_list* list);
 
 //Server functions
+
+//daemon func
 void mx_daemon_start(void);
 void mx_daemon_end(int signal);
 void set_signal(void);
+
+//Func to communicate with the client
+int mx_send_pubkey(void *arg);
+int mx_recieve_aes(void *arg);
 void mx_process_client_request(cJSON* json);
 void handle_login_request(cJSON* json);
 
+//security func
+int aes_encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
+                unsigned char *iv, unsigned char *ciphertext);
 int aes_decrypt(const unsigned char* encrypted_data, int encrypted_len, const unsigned char* aes_key,
 	const unsigned char* iv, unsigned char* decrypted_data);
 int decrypt_aes_key_with_private_key(const unsigned char* encrypted_aes_key, int encrypted_len, unsigned char* aes_key);
-int mx_hex_to_bytes(const char* hex_str, unsigned char* out_bytes, size_t max_bytes);
+cJSON *decrypt_json(EVP_PKEY *privkey, const unsigned char *encrypted_data, size_t encrypted_data_len);
+
+//hex utils
+int mx_hex_to_bytes(const char *hex_str, unsigned char *out_bytes, size_t max_bytes);
+void bytes_to_hex_string(const unsigned char *bytes, int len, char *hex_str);
 
 #endif 

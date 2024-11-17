@@ -49,6 +49,34 @@ int decrypt_aes_key_with_private_key(const unsigned char *encrypted_aes_key, int
     return (int)aes_key_len;
 }
 
+int aes_encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
+                unsigned char *iv, unsigned char *ciphertext) {
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+    if (!ctx) return -1;
+
+    int len, ciphertext_len;
+
+    if (1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv)) {
+        EVP_CIPHER_CTX_free(ctx);
+        return -1;
+    }
+
+    if (1 != EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len)) {
+        EVP_CIPHER_CTX_free(ctx);
+        return -1;
+    }
+    ciphertext_len = len;
+
+    if (1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len)) {
+        EVP_CIPHER_CTX_free(ctx);
+        return -1;
+    }
+    ciphertext_len += len;
+
+    EVP_CIPHER_CTX_free(ctx);
+    return ciphertext_len;
+}
+
 int aes_decrypt(const unsigned char *encrypted_data, int encrypted_len, const unsigned char *aes_key,
                 const unsigned char *iv, unsigned char *decrypted_data) {
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
@@ -77,3 +105,4 @@ int aes_decrypt(const unsigned char *encrypted_data, int encrypted_len, const un
     EVP_CIPHER_CTX_free(ctx);
     return plaintext_len;
 }
+

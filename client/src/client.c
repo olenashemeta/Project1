@@ -1,43 +1,83 @@
 #include "../inc/client.h"
 
 static void *connection(void *arg) {
-    t_main *main = (t_main*)arg;
-    main->socket = mx_connect_to_server(main);
+    t_main *main = (t_main *)arg;
+
+    while (!main->is_closing) {
+        main->socket = mx_connect_to_server(main);
         if (main->socket == -1) {
-        perror("Failed to connect to server");
-        return NULL;
-    }
-    printf("Connected to server.\n");
-    if (mx_receiving_pubkey(main->socket, &main->pubkey) == -1) {
-        perror("Failed to receive public key from server");
+            printf("Failed to connect to server. Retrying in %d seconds...\n", main->rec_delay);
+            sleep(main->rec_delay);
+            continue;
+        }
+
+        printf("Connected to server.\n");
+        main->is_connected = true;
+
+        if (mx_receiving_pubkey(main->socket, &main->pubkey) == -1) {
+            perror("Failed to receive public key from server. Retrying connection...");
+            close(main->socket);
+            main->is_connected = false;
+            main->is_closing = true;
+        }
+
+        printf("Received public key:\n");
+        if (!PEM_write_PUBKEY(stdout, main->pubkey)) {
+            fprintf(stderr, "Failed to write public key\n");
+            ERR_print_errors_fp(stderr);
+            close(main->socket);
+            main->is_connected = false;
+            main->is_closing = true;
+        }
+
+        if (generate_aes_key_iv(main->aes_key, main->aes_iv) != 0) {
+            fprintf(stderr, "Failed to generate AES key and IV. Retrying connection...\n");
+            close(main->socket);
+            main->is_connected = false;
+            main->is_closing = true;
+        }
+
+        if (mx_transfer_aes_key(main->aes_key, main->aes_iv, main->socket, main->pubkey) != 0) {
+            fprintf(stderr, "Failed to transfer AES key to server. Retrying connection...\n");
+            close(main->socket);
+            main->is_connected = false;
+            main->is_closing = true;
+        }
+
+        printf("AES key and IV successfully transferred to server.\n");
+
+        while (!main->is_closing) {
+            char buffer[4096];
+            ssize_t bytes_received = recv(main->socket, buffer, sizeof(buffer) - 1, 0);
+            if (bytes_received <= 0) {
+                fprintf(stderr, "Connection lost. Reconnecting...\n");
+                close(main->socket);
+                main->is_connected = false;
+                break;
+            }
+
+            buffer[bytes_received] = '\0';
+
+            cJSON *json_response = cJSON_Parse(buffer);
+            if (!json_response) {
+                fprintf(stderr, "Failed to parse JSON response from server.\n");
+                continue;
+            }
+
+            pthread_mutex_lock(&main->lock);
+            cJSON_Delete(main->server_response);
+            main->server_response = json_response;
+            main->has_new_data = true;
+            pthread_cond_signal(&main->cond);
+            pthread_mutex_unlock(&main->lock);
+        }
+
         close(main->socket);
-        return NULL;
+        main->socket = -1;
     }
 
-    printf("Received public key:\n");
-    if (!PEM_write_PUBKEY(stdout, main->pubkey)) {
-        fprintf(stderr, "Failed to write public key\n");
-        ERR_print_errors_fp(stderr);
-    }
-
-    while (1) {
-        char buffer[4096];
-        ssize_t bytes_received = recv(main->socket, buffer, sizeof(buffer), 0);
-        if (bytes_received <= 0) break;
-
-        buffer[bytes_received] = '\0';
-        cJSON *json_response = cJSON_Parse(buffer);
-
-        pthread_mutex_lock(&main->lock);
-        cJSON_Delete(main->server_response);
-        main->server_response = json_response;
-        main->has_new_data = true;
-        pthread_cond_signal(&main->cond);
-        pthread_mutex_unlock(&main->lock);
-    }
-
-    close(main->socket);
-    return NULL;
+    printf("Closing connection thread.\n");
+    pthread_exit(NULL);
 }
 
 static void activate(GtkApplication *app, gpointer user_data) {

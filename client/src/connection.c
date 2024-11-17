@@ -53,3 +53,29 @@ int mx_receiving_pubkey(int socket_fd, EVP_PKEY **pubkey) {
     printf("Public key received and parsed successfully.\n");
     return 0;
 }
+
+
+int mx_transfer_aes_key(const unsigned char *aes_key, const unsigned char *iv, int sock, EVP_PKEY *pubkey) {
+    cJSON *json_transfer_key = form_aes_key_transfer(aes_key, iv, pubkey);
+    
+    if (!json_transfer_key) {
+        fprintf(stderr, "Failed to create key transfer request JSON\n");
+        return 1;
+    }
+        
+    char *json_str = cJSON_PrintUnformatted(json_transfer_key);
+    if (!json_str) {
+        fprintf(stderr, "Failed to print JSON\n");
+        cJSON_Delete(json_transfer_key);
+        return 1;
+    }
+
+    if (send(sock, json_str, strlen(json_str), 0) == -1) {
+        perror("Failed to send key transfer request to server");
+        return 1;
+    }
+
+    free(json_str);
+    cJSON_Delete(json_transfer_key);
+    return 0;
+}

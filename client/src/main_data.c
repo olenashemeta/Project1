@@ -16,9 +16,12 @@ t_main *mx_create_main_data(const char *address, int port) {
     }
 
     main->port = port;
+    main->rec_delay = 5;
+
     main->pubkey = NULL;
     main->server_response = NULL;
     main->has_new_data = false;
+    
     memset(main->aes_key, 0, AES_KEY_SIZE);
     memset(main->aes_iv, 0, AES_IV_SIZE);
 

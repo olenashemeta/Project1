@@ -2,7 +2,7 @@
 
 t_group* group_from_data_list(t_list* list)
 {
-	if (mx_list_size(list) < 5)return NULL;
+	if (mx_list_size(list) < 6)return NULL;
 
 	t_group* ret = (t_group*)malloc(sizeof(t_group));
 
@@ -19,6 +19,9 @@ t_group* group_from_data_list(t_list* list)
 
 	list = list->next;
 	ret->created_at = (char*)list->data;
+
+	list = list->next;
+	ret->last_message_date = (char*)list->data;
 
 	return ret;
 }
@@ -37,12 +40,14 @@ t_group* group_create(const char* name, int created_by)
 
 	ret->created_at = NULL;
 
+	ret->last_message_date = NULL;
+
 	return ret;
 }
 
 t_list* group_list_from_data_list(t_list* list)
 {
-	int size = mx_list_size(list) / 5;
+	int size = mx_list_size(list) / 6;
 	if (size < 1) return NULL;
 	t_list* ret = NULL;
 
@@ -65,7 +70,9 @@ t_list* group_list_from_data_list(t_list* list)
 		g->created_at = (char*)list->data;
 
 		list = list->next;
+		g->last_message_date = (char*)list->data;
 
+		list = list->next;
 		mx_push_back(&ret, g);
 	}
 
@@ -78,6 +85,7 @@ void free_group(t_group** group)
 	mx_strdel(&(*group)->name);
 	mx_strdel(&(*group)->creator_username);
 	mx_strdel(&(*group)->created_at);
+	mx_strdel(&(*group)->last_message_date);
 	free(*group);
 }
 
