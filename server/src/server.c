@@ -1,110 +1,81 @@
 #include "../inc/server.h"
 
-void *handle_client(void *arg) {
-    t_client *client = (t_client *)arg;
+volatile sig_atomic_t daemon_running = 1;
 
-    syslog(LOG_INFO, "Client connected with ID: %d", client->client_id);
+int start_server(const char *port) {
 
-    if (mx_send_pubkey(client) > 0 || mx_recieve_aes(client) > 0) {
-        syslog(LOG_ERR, "Key exchange failed for client ID: %d", client->client_id);
-        close(client->socket_fd);
-        free(client);
-        pthread_exit(NULL);
+    struct addrinfo network_config, *server_info;
+    memset(&network_config, 0, sizeof(network_config));
+
+    network_config.ai_family = AF_INET;
+    network_config.ai_socktype = SOCK_STREAM;
+    network_config.ai_flags = AI_PASSIVE;
+
+    if (getaddrinfo(NULL, port, &network_config, &server_info) != 0) {
+        perror("getaddrinfo failed");
+        return -1;
     }
 
-    while (1) {
-        char buffer[4096];
-        ssize_t received = recv(client->socket_fd, buffer, sizeof(buffer) - 1, 0);
+    int server_sd = socket(server_info->ai_family, server_info->ai_socktype, 0);
+    if (server_sd == -1) {
+        perror("Socket creation failed");
+        freeaddrinfo(server_info);
+        return -1;
+    }
 
-        if (received <= 0) {
-            syslog(LOG_INFO, "Client ID %d disconnected.", client->client_id);
-            break;
-        }
+    if (bind(server_sd, server_info->ai_addr, server_info->ai_addrlen) == -1) {
+        perror("Bind failed");
+        close(server_sd);
+        freeaddrinfo(server_info);
+        return -1;
+    }
 
-        buffer[received] = '\0';
+    freeaddrinfo(server_info);
 
-        cJSON *json = cJSON_Parse(buffer);
-        if (!json) {
-            syslog(LOG_WARNING, "Invalid JSON received from client ID: %d", client->client_id);
+    if (listen(server_sd, 10) == -1) {
+        perror("Listen failed");
+        close(server_sd);
+        return -1;
+    }
+
+    syslog(LOG_INFO, "Server listening on port %s", port);
+
+    while (daemon_running) {
+        struct sockaddr addr;
+        socklen_t addrlen;
+
+        int socket_fd = accept(server_sd, &addr, &addrlen);
+        if (socket_fd == -1) {
+            perror("Accept failed");
             continue;
         }
-        mx_process_client_request(json);
-        cJSON_Delete(json);
-    }
 
-    close(client->socket_fd);
-    free(client);
+        t_client *client = create_new_client(socket_fd);
+
+        char addrstr[INET_ADDRSTRLEN];
+        struct sockaddr_in *client_addr = (struct sockaddr_in *)&addr;
+        inet_ntop(AF_INET, &client_addr->sin_addr, addrstr, INET_ADDRSTRLEN);
+        syslog(LOG_INFO, "Server IP: %s", addrstr);
+
+        if (pthread_create(&client->thread_id, NULL, handle_client, client) != 0) {
+            perror("Thread creation failed");
+            free_client(client);
+            continue;
+        }
+    }
+    syslog(LOG_INFO, "Shutting down server");
+    closelog();
     pthread_exit(NULL);
 }
 
-void start_server(int port) {
-    int server_fd = -1;
-    struct sockaddr_in address;
-    int addrlen = sizeof(address);
-
-    server_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_fd == -1) {
-        perror("Socket creation failed");
-        exit(EXIT_FAILURE);
-    }
-
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(port);
-
-    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) == -1) {
-        perror("Bind failed");
-        close(server_fd);
-        exit(EXIT_FAILURE);
-    }
-
-    if (listen(server_fd, 10) == -1) {
-        perror("Listen failed");
-        close(server_fd);
-        exit(EXIT_FAILURE);
-    }
-
-    syslog(LOG_INFO, "Server listening on port %d", port);
-
-    int client_id = 1;
-    while (1) {
-        t_client *client = malloc(sizeof(t_client));
-        if (!client) {
-            syslog(LOG_ERR, "Memory allocation failed for new client");
-            continue;
-        }
-
-        client->socket_fd = accept(server_fd, (struct sockaddr *)&client->address, (socklen_t *)&addrlen);
-        if (client->socket_fd == -1) {
-            perror("Accept failed");
-            free(client);
-            continue;
-        }
-
-        client->client_id = client_id++;
-
-        pthread_t client_thread;
-        if (pthread_create(&client_thread, NULL, handle_client, client) != 0) {
-            perror("Thread creation failed");
-            close(client->socket_fd);
-            free(client);
-            continue;
-        }
-
-        pthread_detach(client_thread);
-    }
-
-    close(server_fd);
-}
-
 int main(int argc, char **argv) {
-    if (argc == 2 && strcmp(argv[1], "migration_down") == 0) {
-        migration_down();
-        return 1;
-    } else {
-        migration_up();
+    if (argc != 2) {
+        fprintf(stderr, "usage: ./uchat_server [port]\n");
+        return -1;
     }
 
+    const char *port = argv[1];
+    
     mx_daemon_start();
     set_signal();
 
@@ -115,7 +86,8 @@ int main(int argc, char **argv) {
         perror("getcwd failed");
     }
 
-    start_server(8080);
-
-    return 0;
+    if (start_server(port) == -1) {
+        fprintf(stderr, "failed to start server\n");
+        return -1;
+    }
 }

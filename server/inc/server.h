@@ -14,6 +14,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <netdb.h>
 #include <pthread.h>
 #include <signal.h>
 #include <syslog.h>
@@ -22,12 +23,17 @@
 #include <openssl/err.h>
 #include <openssl/pem.h>
 
+extern volatile sig_atomic_t daemon_running;
+/*
+typedef struct s_keys {
+	EVP_PKEY *pkey;
+}				t_keys;
+*/
 typedef struct s_client {
-    int client_id;
+    pthread_t thread_id;
     int socket_fd;
 	unsigned char aes_key[AES_KEY_SIZE];
     unsigned char aes_iv[AES_IV_SIZE];
-    struct sockaddr_in address;
 }              t_client;
 
 //models
@@ -138,12 +144,16 @@ void free_group_list(t_list* list);
 void mx_daemon_start(void);
 void mx_daemon_end(int signal);
 void set_signal(void);
+int start_server(const char *port);
 
 //Func to communicate with the client
+void *handle_client(void *arg);
 int mx_send_pubkey(void *arg);
 int mx_recieve_aes(void *arg);
 void mx_process_client_request(cJSON* json);
 void handle_login_request(cJSON* json);
+t_client *create_new_client(int socket_fd);
+void free_client(t_client *client);
 
 //security func
 int aes_encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,

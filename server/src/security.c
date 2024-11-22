@@ -1,5 +1,85 @@
 #include "../inc/server.h"
 
+// Функція для звільнення ресурсів
+static void cleanup_resources(EVP_PKEY_CTX *ctx, EVP_PKEY *pkey, FILE *private_file, FILE *public_file) {
+    if (ctx) EVP_PKEY_CTX_free(ctx);
+    if (pkey) EVP_PKEY_free(pkey);
+    if (private_file) fclose(private_file);
+    if (public_file) fclose(public_file);
+}
+
+// Функція для генерації RSA-ключів
+int generate_rsa_keys(void) {
+    EVP_PKEY *pkey = NULL;
+    EVP_PKEY_CTX *ctx = NULL;
+    FILE *private_file = NULL, *public_file = NULL;
+
+    // Ініціалізація контексту для генерації ключа
+    ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, NULL);
+    if (!ctx) {
+        syslog(LOG_ERR, "Error: EVP_PKEY_CTX_new_id failed");
+        ERR_print_errors_fp(stderr);
+        cleanup_resources(ctx, pkey, private_file, public_file);
+        return -1;
+    }
+
+    if (EVP_PKEY_keygen_init(ctx) <= 0) {
+        syslog(LOG_ERR, "Error: EVP_PKEY_keygen_init failed");
+        ERR_print_errors_fp(stderr);
+        cleanup_resources(ctx, pkey, private_file, public_file);
+        return -1;
+    }
+
+    // Встановлення розміру ключа
+    if (EVP_PKEY_CTX_set_rsa_keygen_bits(ctx, OPENSSL_RSA_FIPS_MIN_MODULUS_BITS) <= 0) {
+        syslog(LOG_ERR, "Error: EVP_PKEY_CTX_set_rsa_keygen_bits failed");
+        ERR_print_errors_fp(stderr);
+        cleanup_resources(ctx, pkey, private_file, public_file);
+        return -1;
+    }
+
+    // Генерація ключа
+    if (EVP_PKEY_keygen(ctx, &pkey) <= 0) {
+        syslog(LOG_ERR, "Error: EVP_PKEY_keygen failed");
+        ERR_print_errors_fp(stderr);
+        cleanup_resources(ctx, pkey, private_file, public_file);
+        return -1;
+    }
+
+    // Збереження приватного ключа
+    private_file = fopen("private_key.pem", "w");
+    if (!private_file) {
+        syslog(LOG_ERR, "Error: Unable to open file for private key");
+        cleanup_resources(ctx, pkey, private_file, public_file);
+        return -1;
+    }
+    if (!PEM_write_PrivateKey(private_file, pkey, NULL, NULL, 0, NULL, NULL)) {
+        syslog(LOG_ERR, "Error: Unable to write private key");
+        ERR_print_errors_fp(stderr);
+        cleanup_resources(ctx, pkey, private_file, public_file);
+        return -1;
+    }
+
+    // Збереження публічного ключа
+    public_file = fopen("public_key.pem", "w");
+    if (!public_file) {
+        syslog(LOG_ERR, "Error: Unable to open file for public key");
+        cleanup_resources(ctx, pkey, private_file, public_file);
+        return -1;
+    }
+    if (!PEM_write_PUBKEY(public_file, pkey)) {
+        syslog(LOG_ERR, "Error: Unable to write public key");
+        ERR_print_errors_fp(stderr);
+        cleanup_resources(ctx, pkey, private_file, public_file);
+        return -1;
+    }
+
+    syslog(LOG_INFO, "RSA keys successfully generated and saved");
+    cleanup_resources(ctx, pkey, private_file, public_file);
+    return 0;
+    
+}
+
 int decrypt_aes_key_with_private_key(const unsigned char *encrypted_aes_key, int encrypted_len, unsigned char *aes_key) {
     FILE *key_file = fopen("private_key.pem", "r");
     if (!key_file) {
