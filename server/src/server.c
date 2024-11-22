@@ -74,6 +74,8 @@ int main(int argc, char **argv) {
         return -1;
     }
 
+    migration_up();
+
     const char *port = argv[1];
     
     mx_daemon_start();

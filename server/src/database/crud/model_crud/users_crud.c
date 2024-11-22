@@ -71,7 +71,7 @@ t_user* db_user_read_by_id(int id) {
 
 t_user* db_user_read_by_login(const char *login) {
 	char* where = NULL;
-	asprintf(&where, "login = %s", login);
+	asprintf(&where, "login = '%s'", login);
 
 	t_list* list = database_read("id, username, login, password, created_at", "users", where);
 	t_user* ret = user_from_data_list(list);
