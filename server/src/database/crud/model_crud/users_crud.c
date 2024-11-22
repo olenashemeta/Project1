@@ -69,6 +69,20 @@ t_user* db_user_read_by_id(int id) {
 	return ret;
 }
 
+t_user* db_user_read_by_login(const char *login) {
+	char* where = NULL;
+	asprintf(&where, "login = %s", login);
+
+	t_list* list = database_read("id, username, login, password, created_at", "users", where);
+	t_user* ret = user_from_data_list(list);
+	
+	mx_del_list(list, mx_list_size(list));
+
+	mx_strdel(&where);
+
+	return ret;
+}
+
 t_list* db_user_read_all() {
 
 	t_list* list = database_read("id, username, login, password, created_at", "users", NULL);

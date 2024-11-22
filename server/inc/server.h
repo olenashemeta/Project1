@@ -88,6 +88,7 @@ void db_user_delete_by_id(int id);
 void db_user_delete_by_named_field(const char* field, const char* value);
 void db_user_update(t_user* user);
 t_user* db_user_read_by_id(int id);
+t_user* db_user_read_by_login(const char *login);
 t_list* db_user_read_all();
 
 //Messages CRUD

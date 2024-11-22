@@ -7,7 +7,13 @@ NAME = server
 LIB_DIR = ../libs/JsonLib
 LIB_MX_DIR = ../libs/libmx
 SQLITE_DIR = ../libs/Sqlite3Lib
-LDFLAGS = -L$(LIB_DIR) -L$(LIB_MX_DIR) -L$(SQLITE_DIR) -lssl -lcrypto -lcjson -lmx -lsqlite3 -lm -Wl,-rpath=$(LIB_DIR):$(LIB_MX_DIR):$(SQLITE_DIR)
+
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S), Darwin)
+    LDFLAGS = -L$(LIB_DIR) -L$(LIB_MX_DIR) -L$(SQLITE_DIR) -lssl -lcrypto -lcjson -lmx -lsqlite3 -lm
+else
+    LDFLAGS = -L$(LIB_DIR) -L$(LIB_MX_DIR) -L$(SQLITE_DIR) -lssl -lcrypto -lcjson -lmx -lsqlite3 -lm -Wl,-rpath=$(LIB_DIR):$(LIB_MX_DIR):$(SQLITE_DIR)
+endif
 
 SRC_DIRS = $(SRC_DIR) $(SRC_DIR)/database $(SRC_DIR)/database/crud/db_crud $(SRC_DIR)/database/crud/model_crud $(SRC_DIR)/database/migrations $(SRC_DIR)/model_functions
 
