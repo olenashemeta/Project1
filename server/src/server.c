@@ -1,51 +1,51 @@
 #include "../inc/server.h"
 
-volatile sig_atomic_t daemon_running = 1;
+int start_server(t_server *server, const char *port) {
 
-int start_server(const char *port) {
-
-    struct addrinfo network_config, *server_info;
+    struct addrinfo network_config;
     memset(&network_config, 0, sizeof(network_config));
 
     network_config.ai_family = AF_INET;
     network_config.ai_socktype = SOCK_STREAM;
     network_config.ai_flags = AI_PASSIVE;
 
-    if (getaddrinfo(NULL, port, &network_config, &server_info) != 0) {
-        perror("getaddrinfo failed");
-        return -1;
-    }
+    if(getaddrinfo(NULL, port, &network_config, &server->ai)) return -1;
 
-    int server_sd = socket(server_info->ai_family, server_info->ai_socktype, 0);
-    if (server_sd == -1) {
+    server->sd = socket(server->ai->ai_family, server->ai->ai_socktype, 0);
+    if (server->sd == -1) {
         perror("Socket creation failed");
-        freeaddrinfo(server_info);
+        free_server(server);
         return -1;
     }
 
-    if (bind(server_sd, server_info->ai_addr, server_info->ai_addrlen) == -1) {
-        perror("Bind failed");
-        close(server_sd);
-        freeaddrinfo(server_info);
+    if (bind(server->sd, server->ai->ai_addr, server->ai->ai_addrlen) == -1) {
+        if (errno == EADDRINUSE) {
+            syslog(LOG_ERR, "Port %s is already in use\n", port);
+        } else {
+            perror("Bind failed");
+        }
+        free_server(server);
         return -1;
     }
 
-    freeaddrinfo(server_info);
 
-    if (listen(server_sd, 10) == -1) {
+    if (listen(server->sd, 10) == -1) {
         perror("Listen failed");
-        close(server_sd);
+        free_server(server);
         return -1;
     }
-
+    server->is_running = true;
     syslog(LOG_INFO, "Server listening on port %s", port);
 
-    while (daemon_running) {
+    while (server->is_running) {
         struct sockaddr addr;
         socklen_t addrlen;
 
-        int socket_fd = accept(server_sd, &addr, &addrlen);
+        int socket_fd = accept(server->sd, &addr, &addrlen);
         if (socket_fd == -1) {
+            if (errno == EINTR) {
+                break;
+            }
             perror("Accept failed");
             continue;
         }
@@ -55,7 +55,7 @@ int start_server(const char *port) {
         char addrstr[INET_ADDRSTRLEN];
         struct sockaddr_in *client_addr = (struct sockaddr_in *)&addr;
         inet_ntop(AF_INET, &client_addr->sin_addr, addrstr, INET_ADDRSTRLEN);
-        syslog(LOG_INFO, "Server IP: %s", addrstr);
+        syslog(LOG_INFO, "Connected to client IP: %s", addrstr);
 
         if (pthread_create(&client->thread_id, NULL, handle_client, client) != 0) {
             perror("Thread creation failed");
@@ -63,9 +63,10 @@ int start_server(const char *port) {
             continue;
         }
     }
+
     syslog(LOG_INFO, "Shutting down server");
-    closelog();
-    pthread_exit(NULL);
+    free_server(server);
+    return 0;
 }
 
 int main(int argc, char **argv) {
@@ -77,9 +78,10 @@ int main(int argc, char **argv) {
     migration_up();
 
     const char *port = argv[1];
-    
+
+    t_server server;
     mx_daemon_start();
-    set_signal();
+    set_signal(&server);
 
     char cwd[1024];
     if (getcwd(cwd, sizeof(cwd))) {
@@ -88,7 +90,7 @@ int main(int argc, char **argv) {
         perror("getcwd failed");
     }
 
-    if (start_server(port) == -1) {
+    if (start_server(&server, port) == -1) {
         fprintf(stderr, "failed to start server\n");
         return -1;
     }

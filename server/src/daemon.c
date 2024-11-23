@@ -17,21 +17,31 @@ void mx_daemon_start(void) {
         exit(EXIT_FAILURE);
     }
 
-    openlog("MyDaemon", LOG_PID, LOG_DAEMON);
+    openlog("UchatServer", LOG_PID, LOG_DAEMON);
     syslog(LOG_INFO, "Daemon started");
 }
 
-void mx_daemon_end(int signal) {
-    syslog(LOG_INFO, "Daemon received termination signal");
-    daemon_running = 0;
+void mx_daemon_end(int signal, void *context) {
+    if (context == NULL) {
+        syslog(LOG_WARNING, "Received termination signal, but context is NULL");
+        return;
+    }
+
+    t_server *server_ctx = (t_server *)context;
+    syslog(LOG_INFO, "Daemon received termination signal %d", signal);
+    server_ctx->is_running = false;
 }
 
-void set_signal(void) {
-    struct sigaction act;
+void set_signal(t_server *server) {
+    if (server == NULL) {
+        syslog(LOG_ERR, "Server context is NULL in set_signal");
+        exit(EXIT_FAILURE);
+    }
 
+    struct sigaction act;
     sigemptyset(&act.sa_mask);
-    act.sa_handler = mx_daemon_end;
-    act.sa_flags = SA_RESTART;
+    act.sa_flags = SA_SIGINFO;
+    act.sa_sigaction = mx_daemon_end;
 
     if (sigaction(SIGTERM, &act, NULL) == -1) {
         syslog(LOG_ERR, "sigaction failed: %s", strerror(errno));

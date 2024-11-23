@@ -36,6 +36,12 @@ typedef struct s_client {
     unsigned char aes_iv[AES_IV_SIZE];
 }              t_client;
 
+typedef struct s_server {
+	int sd;
+	bool is_running;
+	struct addrinfo *ai;
+}			  t_server;
+
 //models
 typedef struct s_user {
 	int id;
@@ -143,9 +149,9 @@ void free_group_list(t_list* list);
 
 //daemon func
 void mx_daemon_start(void);
-void mx_daemon_end(int signal);
-void set_signal(void);
-int start_server(const char *port);
+void mx_daemon_end(int signal, void *context);
+void set_signal(t_server *server);
+int start_server(t_server *server, const char *port);
 
 //Func to communicate with the client
 void *handle_client(void *arg);
@@ -167,5 +173,8 @@ cJSON *decrypt_json(EVP_PKEY *privkey, const unsigned char *encrypted_data, size
 //hex utils
 int mx_hex_to_bytes(const char *hex_str, unsigned char *out_bytes, size_t max_bytes);
 void bytes_to_hex_string(const unsigned char *bytes, int len, char *hex_str);
+
+t_server *create_server(void);
+void free_server(t_server *server);
 
 #endif 
