@@ -24,7 +24,7 @@ KEY_DIR = .
 PRIVATE_KEY = $(KEY_DIR)/private_key.pem
 PUBLIC_KEY = $(KEY_DIR)/public_key.pem
 
-all: keys $(NAME)
+all: $(NAME)
 
 $(NAME): $(OBJS)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
@@ -36,13 +36,5 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 
-keys: $(PRIVATE_KEY) $(PUBLIC_KEY)
-
-$(PRIVATE_KEY):
-	openssl genpkey -algorithm RSA -out $(PRIVATE_KEY)
-
-$(PUBLIC_KEY): $(PRIVATE_KEY)
-	openssl rsa -in $(PRIVATE_KEY) -pubout -out $(PUBLIC_KEY)
-
 clean:
-	rm -rf $(NAME) $(OBJ_DIR) $(PRIVATE_KEY) $(PUBLIC_KEY)
+	rm -rf $(NAME) $(OBJ_DIR)

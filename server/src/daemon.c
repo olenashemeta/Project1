@@ -21,7 +21,9 @@ void mx_daemon_start(void) {
     syslog(LOG_INFO, "Daemon started");
 }
 
-void mx_daemon_end(int signal, void *context) {
+void mx_daemon_end(int signal, siginfo_t *info, void *context) {
+    (void)info;
+
     if (context == NULL) {
         syslog(LOG_WARNING, "Received termination signal, but context is NULL");
         return;

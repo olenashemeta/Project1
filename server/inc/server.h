@@ -23,17 +23,16 @@
 #include <openssl/err.h>
 #include <openssl/pem.h>
 
-extern volatile sig_atomic_t daemon_running;
-/*
 typedef struct s_keys {
 	EVP_PKEY *pkey;
-}				t_keys;
-*/
-typedef struct s_client {
-    pthread_t thread_id;
-    int socket_fd;
 	unsigned char aes_key[AES_KEY_SIZE];
-    unsigned char aes_iv[AES_IV_SIZE];
+	unsigned char aes_iv[AES_IV_SIZE];
+}				t_keys;
+
+typedef struct s_client {
+	pthread_t thread_id;
+	int socket_fd;
+	t_keys keys;
 }              t_client;
 
 typedef struct s_server {
@@ -149,14 +148,12 @@ void free_group_list(t_list* list);
 
 //daemon func
 void mx_daemon_start(void);
-void mx_daemon_end(int signal, void *context);
+void mx_daemon_end(int signal, siginfo_t *info, void *context);
 void set_signal(t_server *server);
 int start_server(t_server *server, const char *port);
 
 //Func to communicate with the client
 void *handle_client(void *arg);
-int mx_send_pubkey(void *arg);
-int mx_recieve_aes(void *arg);
 void mx_process_client_request(cJSON* json);
 void handle_login_request(cJSON* json);
 t_client *create_new_client(int socket_fd);
@@ -167,8 +164,14 @@ int aes_encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
                 unsigned char *iv, unsigned char *ciphertext);
 int aes_decrypt(const unsigned char* encrypted_data, int encrypted_len, const unsigned char* aes_key,
 	const unsigned char* iv, unsigned char* decrypted_data);
-int decrypt_aes_key_with_private_key(const unsigned char* encrypted_aes_key, int encrypted_len, unsigned char* aes_key);
-cJSON *decrypt_json(EVP_PKEY *privkey, const unsigned char *encrypted_data, size_t encrypted_data_len);
+int rsa_decrypt_aes_key(EVP_PKEY *private_key, const unsigned char *encrypted_aes_key, size_t encrypted_len, 
+                        unsigned char **decrypted_key, size_t *decrypted_key_len);
+int generate_rsa_keys(t_keys *keys);
+void free_keys(t_keys *keys);
+int rsa_keys_to_pem(EVP_PKEY *pkey, unsigned char **pubkey_pem, size_t *pubkey_len,
+                    unsigned char **privkey_pem, size_t *privkey_len);
+int mx_receive_aes(t_client *client, unsigned char *encrypted_aes_key, size_t *encrypted_key_len, unsigned char *iv);
+int handshake(t_client *client);
 
 //hex utils
 int mx_hex_to_bytes(const char *hex_str, unsigned char *out_bytes, size_t max_bytes);
@@ -176,5 +179,6 @@ void bytes_to_hex_string(const unsigned char *bytes, int len, char *hex_str);
 
 t_server *create_server(void);
 void free_server(t_server *server);
+void free_client_keys(t_client *client);
 
 #endif 

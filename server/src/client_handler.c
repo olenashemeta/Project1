@@ -4,8 +4,8 @@ void *handle_client(void *arg) {
     t_client *client = (t_client *)arg;
 
     syslog(LOG_INFO, "Client connected with ID: %ld", client->thread_id);
-
-    if (mx_send_pubkey(client) > 0 || mx_recieve_aes(client) > 0) {
+    
+    if (handshake(client) != 0) {
         syslog(LOG_ERR, "Key exchange failed for client ID: %ld", client->thread_id);
         close(client->socket_fd);
         free(client);

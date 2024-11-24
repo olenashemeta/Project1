@@ -13,7 +13,7 @@ void mx_process_client_request(cJSON *json) {
     }
     else if (strcmp(type->valuestring, "login") == 0) {
         syslog(LOG_INFO, "Processing login request");
-        handle_login_request(json);
+        //handle_login_request(json);
     }
     /*
     else if (strcmp(type->valuestring, "search_chats") == 0) {

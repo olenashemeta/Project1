@@ -1,5 +1,5 @@
 #include "../inc/server.h"
-
+/*
 void handle_login_request(cJSON *json) {
     cJSON *userlogin_json = cJSON_GetObjectItemCaseSensitive(json, "userlogin");
     cJSON *encrypted_password_json = cJSON_GetObjectItemCaseSensitive(json, "password");
@@ -65,4 +65,4 @@ void handle_login_request(cJSON *json) {
     syslog(LOG_INFO, "Login attempt - Login: %s, Password: %s", login, decrypted_password);
 
     cJSON_Delete(json);
-}
+}*/
