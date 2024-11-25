@@ -17,6 +17,7 @@ int start_server(t_server *server, const char *port) {
         free_server(server);
         return -1;
     }
+    syslog(LOG_INFO, "Socket created successfully");
 
     if (bind(server->sd, server->ai->ai_addr, server->ai->ai_addrlen) == -1) {
         if (errno == EADDRINUSE) {
@@ -27,6 +28,7 @@ int start_server(t_server *server, const char *port) {
         free_server(server);
         return -1;
     }
+    syslog(LOG_INFO, "Bind successful on port %s", port);
 
 
     if (listen(server->sd, 10) == -1) {
@@ -39,17 +41,18 @@ int start_server(t_server *server, const char *port) {
 
     while (server->is_running) {
         struct sockaddr addr;
-        socklen_t addrlen;
+        socklen_t addrlen = sizeof(addr);
 
         int socket_fd = accept(server->sd, &addr, &addrlen);
         if (socket_fd == -1) {
             if (errno == EINTR) {
+                syslog(LOG_WARNING, "Accept interrupted by signal");
                 break;
             }
-            perror("Accept failed");
+            syslog(LOG_ERR, "Accept failed: %s", strerror(errno));
             continue;
         }
-
+        syslog(LOG_INFO, "New client connection accepted");
         t_client *client = create_new_client(socket_fd);
 
         char addrstr[INET_ADDRSTRLEN];
@@ -82,13 +85,6 @@ int main(int argc, char **argv) {
     t_server server;
     mx_daemon_start();
     set_signal(&server);
-
-    char cwd[1024];
-    if (getcwd(cwd, sizeof(cwd))) {
-        syslog(LOG_INFO, "Current working directory: %s", cwd);
-    } else {
-        perror("getcwd failed");
-    }
 
     if (start_server(&server, port) == -1) {
         fprintf(stderr, "failed to start server\n");

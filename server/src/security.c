@@ -73,7 +73,6 @@ int handshake(t_client *client) {
         return -1;
     }
 
-
     if (send(client->socket_fd, pubkey_pem, pubkey_len, 0) != (ssize_t)pubkey_len) {
         syslog(LOG_ERR, "Error: Failed to send public key to client");
         free(pubkey_pem);

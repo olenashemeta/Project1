@@ -32,13 +32,13 @@ int mx_receiving_pubkey(int socket_fd, EVP_PKEY **pubkey) {
     ssize_t received = recv(socket_fd, buffer, sizeof(buffer), 0);
 
     if (received <= 0) {
-        perror("Failed to receive public key");;
+        perror("Failed to receive public key\n");;
         return -1;
     }
 
     BIO *bio = BIO_new_mem_buf(buffer, received);
     if (!bio) {
-        perror("Failed to create BIO");
+        perror("Failed to create BIO\n");
         return -1;
     }
 
