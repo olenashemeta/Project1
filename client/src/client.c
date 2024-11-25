@@ -14,37 +14,14 @@ static void *connection(void *arg) {
         printf("Connected to server.\n");
         main->is_connected = true;
 
-        if (mx_receiving_pubkey(main->socket, &main->pubkey) == -1) {
-            perror("Failed to receive public key from server. Retrying connection...");
+        if (handshake(main) != 0) {
+            fprintf(stderr, "Handshake failed. Retrying connection...\n");
             close(main->socket);
             main->is_connected = false;
-            main->is_closing = true;
+            continue;
         }
 
-        printf("Received public key:\n");
-        if (!PEM_write_PUBKEY(stdout, main->pubkey)) {
-            fprintf(stderr, "Failed to write public key\n");
-            ERR_print_errors_fp(stderr);
-            close(main->socket);
-            main->is_connected = false;
-            main->is_closing = true;
-        }
-
-        if (generate_aes_key_iv(main->aes_key, main->aes_iv) != 0) {
-            fprintf(stderr, "Failed to generate AES key and IV. Retrying connection...\n");
-            close(main->socket);
-            main->is_connected = false;
-            main->is_closing = true;
-        }
-
-        if (mx_transfer_aes_key(main->aes_key, main->aes_iv, main->socket, main->pubkey) != 0) {
-            fprintf(stderr, "Failed to transfer AES key to server. Retrying connection...\n");
-            close(main->socket);
-            main->is_connected = false;
-            main->is_closing = true;
-        }
-
-        printf("AES key and IV successfully transferred to server.\n");
+        printf("Handshake succeeded. AES session established.\n");
 
         while (!main->is_closing) {
             char buffer[4096];

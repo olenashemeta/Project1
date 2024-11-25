@@ -1,10 +1,81 @@
 #include "../inc/client.h"
 
-int generate_aes_key_iv(unsigned char *key, unsigned char *iv) {
-    if (!RAND_bytes(key, AES_KEY_SIZE) || !RAND_bytes(iv, AES_IV_SIZE)) {
-        fprintf(stderr, "Failed to generate AES key or IV\n");
+int generate_aes_key_iv(t_main *main) {
+    if (!main) {
+        fprintf(stderr, "Invalid main structure\n");
         return -1;
     }
+
+    if (!RAND_bytes(main->keys.aes_key, AES_KEY_SIZE)) {
+        fprintf(stderr, "Failed to generate AES key\n");
+        return -1;
+    }
+
+    if (!RAND_bytes(main->keys.aes_iv, AES_IV_SIZE)) {
+        fprintf(stderr, "Failed to generate AES IV\n");
+        return -1;
+    }
+
+    printf("AES key and IV generated successfully.\n");
+    return 0;
+}
+
+int handshake(t_main *main) {
+    if (!main || main->socket < 0) {
+        fprintf(stderr, "Invalid main structure or socket\n");
+        return -1;
+    }
+
+    // Шаг 1: Получение публичного ключа от сервера
+    if (mx_receiving_pubkey(main) != 0) {
+        fprintf(stderr, "Failed to receive server public key\n");
+        return -1;
+    }
+    printf("Server public key received successfully.\n");
+
+    // Шаг 2: Генерация AES-ключей
+    if (generate_aes_key_iv(main) != 0) {
+        fprintf(stderr, "Failed to generate AES keys\n");
+        return -1;
+    }
+    printf("AES key and IV generated successfully.\n");
+
+    // Шаг 3: Отправка AES-ключей серверу
+    if (mx_transfer_aes_key(main) != 0) {
+        fprintf(stderr, "Failed to transfer AES keys to the server\n");
+        return -1;
+    }
+    printf("AES key and IV sent successfully.\n");
+
+    /*
+    // Шаг 4: Получение подтверждения от сервера 
+    char buffer[4096];
+    ssize_t received = recv(main->socket, buffer, sizeof(buffer) - 1, 0);
+    if (received <= 0) {
+        perror("Failed to receive confirmation from server");
+        return -1;
+    }
+
+    buffer[received] = '\0';
+    printf("Server response: %s\n", buffer);
+
+    // обработка ответа сервера
+    cJSON *response = cJSON_Parse(buffer);
+    if (!response) {
+        fprintf(stderr, "Failed to parse server response\n");
+        return -1;
+    }
+
+    cJSON *status = cJSON_GetObjectItem(response, "status");
+    if (!status || !cJSON_IsString(status) || strcmp(status->valuestring, "OK") != 0) {
+        fprintf(stderr, "Handshake failed: server returned error\n");
+        cJSON_Delete(response);
+        return -1;
+    }
+    printf("Handshake completed successfully.\n");
+
+    cJSON_Delete(response);
+    */
     return 0;
 }
 

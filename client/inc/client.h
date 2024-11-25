@@ -20,6 +20,12 @@
 #define AES_KEY_SIZE 32
 #define AES_IV_SIZE 16 
 
+typedef struct s_keys {
+	EVP_PKEY *pkey;
+	unsigned char aes_key[AES_KEY_SIZE];
+	unsigned char aes_iv[AES_IV_SIZE];
+}				t_keys;
+
 typedef struct s_main {
 	int socket;
 	char *address;
@@ -34,6 +40,7 @@ typedef struct s_main {
 	pthread_mutex_t lock;
 	pthread_cond_t cond;
 	bool has_new_data;
+	t_keys keys;
 
 	unsigned char aes_key[AES_KEY_SIZE];
     unsigned char aes_iv[AES_IV_SIZE];
@@ -46,11 +53,12 @@ typedef struct s_user {
 
 //func to communicate with the server
 int mx_connect_to_server(t_main *main);
-int mx_receiving_pubkey(int socket_fd, EVP_PKEY **pubkey);
-int mx_transfer_aes_key(const unsigned char *aes_key, const unsigned char *iv, int sock, EVP_PKEY *pubkey);
+int mx_receiving_pubkey(t_main *main);
+int mx_transfer_aes_key(t_main *main);
+int handshake(t_main *main);
 
 //security func
-int generate_aes_key_iv(unsigned char *key, unsigned char *iv);
+int generate_aes_key_iv(t_main *main);
 int aes_encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key, unsigned char *iv, unsigned char *ciphertext);
 unsigned char *encrypt_json_with_aes(const unsigned char *aes_key, const unsigned char *iv, cJSON *json, size_t *out_len);
 int aes_decrypt(const unsigned char *ciphertext, int ciphertext_len, const unsigned char *key, const unsigned char *iv, unsigned char *plaintext);
