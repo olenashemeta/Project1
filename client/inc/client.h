@@ -76,8 +76,9 @@ void mx_free_main_data(t_main *main);
 cJSON *form_login_request_test(const char *login, const char *password);
 cJSON *form_aes_key_transfer(const unsigned char *aes_key, const unsigned char *iv, EVP_PKEY *pubkey);
 
-//hex utils
-
+//Base64
+char *base64_encode(const unsigned char *input, size_t input_len);
+unsigned char *base64_decode(const char *input, size_t *output_len);
 
 //test func
 t_user *mx_create_client(void);
@@ -85,7 +86,6 @@ void mx_print_client(const t_user *client);
 void mx_free_client(t_user *client);
 
 void test_base64_encoding(t_main *main_data);
-char *base64_encode(const unsigned char *input, size_t input_len);
-unsigned char *base64_decode(const char *input, size_t *output_len);
+
 
 #endif

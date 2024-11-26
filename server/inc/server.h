@@ -174,7 +174,7 @@ int rsa_keys_to_pem(EVP_PKEY *pkey, unsigned char **pubkey_pem, size_t *pubkey_l
 int mx_receive_aes(t_client *client, unsigned char *encrypted_aes_key, size_t *encrypted_key_len, unsigned char *iv);
 int handshake(t_client *client);
 
-//hex utils
+//base64
 unsigned char *base64_decode(const char *input, size_t *output_len);
 char *base64_encode(const unsigned char *input, size_t input_len);
 
