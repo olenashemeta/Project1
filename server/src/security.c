@@ -41,14 +41,18 @@ int generate_rsa_keys(t_keys *keys) {
     EVP_PKEY_CTX_free(ctx);
     return 0;
 }
+//test func
+static void log_aes_key_hash_to_syslog(const unsigned char *aes_key, size_t length) {
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256(aes_key, length, hash);
 
-void free_keys(t_keys *keys) {
-    if (!keys) return;
-
-    if (keys->pkey) {
-        EVP_PKEY_free(keys->pkey);
-        keys->pkey = NULL;
+    char hex_hash[SHA256_DIGEST_LENGTH * 2 + 1];
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
+        sprintf(hex_hash + i * 2, "%02x", hash[i]);
     }
+    hex_hash[SHA256_DIGEST_LENGTH * 2] = '\0';
+
+    syslog(LOG_INFO, "Computed SHA-256 hash of AES key: %s", hex_hash);
 }
 
 int handshake(t_client *client) {
@@ -115,6 +119,8 @@ int handshake(t_client *client) {
     }
 
     memcpy(client->keys.aes_key, decrypted_key, AES_KEY_SIZE);
+    //use func for testing
+    log_aes_key_hash_to_syslog(client->keys.aes_key, AES_KEY_SIZE);
     memcpy(client->keys.aes_iv, iv, AES_IV_SIZE);
     free(decrypted_key);
 

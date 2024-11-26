@@ -20,35 +20,46 @@ int generate_aes_key_iv(t_main *main) {
     return 0;
 }
 
+//test func
+static void print_aes_key_hash(const unsigned char *aes_key, size_t length) {
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256(aes_key, length, hash);
+
+    char hex_hash[SHA256_DIGEST_LENGTH * 2 + 1];
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
+        sprintf(hex_hash + i * 2, "%02x", hash[i]);
+    }
+    hex_hash[SHA256_DIGEST_LENGTH * 2] = '\0';
+
+    printf("Computed SHA-256 hash of AES key: %s\n", hex_hash);
+}
+
+
 int handshake(t_main *main) {
     if (!main || main->socket < 0) {
         fprintf(stderr, "Invalid main structure or socket\n");
         return -1;
     }
 
-    // Шаг 1: Получение публичного ключа от сервера
     if (mx_receiving_pubkey(main) != 0) {
         fprintf(stderr, "Failed to receive server public key\n");
         return -1;
     }
-    printf("Server public key received successfully.\n");
 
-    // Шаг 2: Генерация AES-ключей
     if (generate_aes_key_iv(main) != 0) {
         fprintf(stderr, "Failed to generate AES keys\n");
         return -1;
     }
-    printf("AES key and IV generated successfully.\n");
-
-    // Шаг 3: Отправка AES-ключей серверу
+    // use func for testing
+    print_aes_key_hash(main->keys.aes_key, AES_KEY_SIZE);
+   //test_base64_encoding(main);
     if (mx_transfer_aes_key(main) != 0) {
         fprintf(stderr, "Failed to transfer AES keys to the server\n");
         return -1;
     }
-    printf("AES key and IV sent successfully.\n");
 
     /*
-    // Шаг 4: Получение подтверждения от сервера 
+    //Получение подтверждения от сервера 
     char buffer[4096];
     ssize_t received = recv(main->socket, buffer, sizeof(buffer) - 1, 0);
     if (received <= 0) {

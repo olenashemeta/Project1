@@ -22,6 +22,7 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/pem.h>
+#include <openssl/evp.h>
 
 typedef struct s_keys {
 	EVP_PKEY *pkey;
@@ -174,8 +175,8 @@ int mx_receive_aes(t_client *client, unsigned char *encrypted_aes_key, size_t *e
 int handshake(t_client *client);
 
 //hex utils
-int mx_hex_to_bytes(const char *hex_str, unsigned char *out_bytes, size_t max_bytes);
-void bytes_to_hex_string(const unsigned char *bytes, int len, char *hex_str);
+unsigned char *base64_decode(const char *input, size_t *output_len);
+char *base64_encode(const unsigned char *input, size_t input_len);
 
 t_server *create_server(void);
 void free_server(t_server *server);
