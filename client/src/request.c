@@ -70,15 +70,28 @@ cJSON *form_aes_key_transfer(const unsigned char *aes_key, const unsigned char *
     return json_payload;
 }
 
-void send_json_request(cJSON *json_payload, bool is_connected, int socket) {
-    char *json_string = cJSON_PrintUnformatted(json_payload);
+void prepare_and_send_json(cJSON *json_payload, t_main *main) {
+    if (!main || !json_payload) {
+        fprintf(stderr, "Invalid arguments to prepare_and_send_json\n");
+        return;
+    }
 
-    if (is_connected) {
-        t_request *req = create_request(json_string);
-        send_request(req, socket);
-        free_request(req);
+    size_t encrypted_data_len;
+    unsigned char *encrypted_data = encrypt_json_with_aes(main->keys.aes_key, main->keys.aes_iv, json_payload, &encrypted_data_len);
+    if (!encrypted_data) {
+        fprintf(stderr, "Failed to encrypt JSON object\n");
+        cJSON_Delete(json_payload);
+        return;
+    }
+
+    if (main->is_connected) {
+        t_request *req = create_request((char *)encrypted_data, encrypted_data_len);
+        if (req) {
+            send_request(req, main->socket);
+            free_request(req);
+        }
     }
 
     cJSON_Delete(json_payload);
-    free(json_string);
+    free(encrypted_data);
 }

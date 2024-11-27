@@ -17,6 +17,7 @@
 #include <openssl/rand.h>
 #include <openssl/sha.h>
 #include <openssl/evp.h>
+#include <openssl/aes.h>
 
 #define AES_KEY_SIZE 32
 #define AES_IV_SIZE 16 
@@ -60,10 +61,13 @@ int handshake(t_main *main);
 
 //security func
 int generate_aes_key_iv(t_main *main);
-int aes_encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key, unsigned char *iv, unsigned char *ciphertext);
-unsigned char *encrypt_json_with_aes(const unsigned char *aes_key, const unsigned char *iv, cJSON *json, size_t *out_len);
-int aes_decrypt(const unsigned char *ciphertext, int ciphertext_len, const unsigned char *key, const unsigned char *iv, unsigned char *plaintext);
+
+unsigned char *encrypt_json_with_aes(const unsigned char *aes_key, const unsigned char *iv, 
+                                     cJSON *json, size_t *out_len);
 int encrypt_aes_key(EVP_PKEY *pubkey, const unsigned char *aes_key, unsigned char *encrypted_key);
+
+int aes_decrypt(const unsigned char *ciphertext, int ciphertext_len, const unsigned char *key, const unsigned char *iv, unsigned char *plaintext);
+int aes_encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key, unsigned char *iv, unsigned char *ciphertext);
 
 //UI func
 void login_window(GtkApplication *app, gpointer user_data);
@@ -75,6 +79,7 @@ void mx_free_main_data(t_main *main);
 //func json request
 cJSON *form_login_request(const char *login, const char *password);
 cJSON *form_aes_key_transfer(const unsigned char *aes_key, const unsigned char *iv, EVP_PKEY *pubkey);
+void prepare_and_send_json(cJSON *json_payload, t_main *main);
 void send_request(t_request *reg, int socket);
 
 //Base64
@@ -82,7 +87,7 @@ char *base64_encode(const unsigned char *input, size_t input_len);
 unsigned char *base64_decode(const char *input, size_t *output_len);
 
 //request utils func
-t_request *create_request(const char *data);
+t_request *create_request(const char *data, size_t data_len);
 void free_request(t_request *req);
 
 //test func

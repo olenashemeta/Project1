@@ -9,7 +9,8 @@
         "bio.h": "c",
         "json.h": "c",
         "cjson.h": "c",
-        "libmx.h": "c"
+        "libmx.h": "c",
+        "aes.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

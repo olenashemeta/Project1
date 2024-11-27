@@ -15,40 +15,9 @@ static void on_login_button_clicked(GtkButton *button, gpointer user_data) {
     
 
     cJSON *login_request = form_login_request(user->login, user->password);
-    //if (!login_request) {
-    //    fprintf(stderr, "Failed to create login request JSON\n");
-    //    return;
-    //}
 
-    //size_t encrypted_data_len;
+    prepare_and_send_json(login_request, main);
 
-    /*
-    unsigned char *encrypted_data = encrypt_json(main->pubkey, login_request, &encrypted_data_len);
-    if (!encrypted_data) {
-        fprintf(stderr, "Failed to encrypt JSON object\n");
-        return;
-    }
-    */
-    //unsigned char *encrypted_data = encrypt_json_with_aes(main->aes_key, main->aes_iv, login_request, &encrypted_data_len);
-    //if (!encrypted_data) {
-    //    fprintf(stderr, "Failed to encrypt JSON object\n");
-    //    return;
-    //}
-
-    //printf("Login request JSON: %s\n", encrypted_data);
-    
-    /*
-    uint32_t data_len = htonl((uint32_t)encrypted_data_len);
-    if (send(main->socket, &data_len, sizeof(data_len), 0) == -1) {
-        perror("Failed to send data length to server");
-    }
-
-    if (send(main->socket, encrypted_data, encrypted_data_len, 0) == -1) {
-        perror("Failed to send encrypted data to server");
-    }
-    */
-    //free(encrypted_data);
-    //cJSON_Delete(login_request);
     mx_free_client(user);
 }
  
