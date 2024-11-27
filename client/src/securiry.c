@@ -57,36 +57,6 @@ int handshake(t_main *main) {
         fprintf(stderr, "Failed to transfer AES keys to the server\n");
         return -1;
     }
-
-    /*
-    //Получение подтверждения от сервера 
-    char buffer[4096];
-    ssize_t received = recv(main->socket, buffer, sizeof(buffer) - 1, 0);
-    if (received <= 0) {
-        perror("Failed to receive confirmation from server");
-        return -1;
-    }
-
-    buffer[received] = '\0';
-    printf("Server response: %s\n", buffer);
-
-    // обработка ответа сервера
-    cJSON *response = cJSON_Parse(buffer);
-    if (!response) {
-        fprintf(stderr, "Failed to parse server response\n");
-        return -1;
-    }
-
-    cJSON *status = cJSON_GetObjectItem(response, "status");
-    if (!status || !cJSON_IsString(status) || strcmp(status->valuestring, "OK") != 0) {
-        fprintf(stderr, "Handshake failed: server returned error\n");
-        cJSON_Delete(response);
-        return -1;
-    }
-    printf("Handshake completed successfully.\n");
-
-    cJSON_Delete(response);
-    */
     return 0;
 }
 

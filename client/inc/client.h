@@ -27,6 +27,11 @@ typedef struct s_keys {
 	unsigned char aes_iv[AES_IV_SIZE];
 }				t_keys;
 
+typedef struct s_request {
+	size_t len;
+	char *data;
+}			   t_request;
+
 typedef struct s_main {
 	int socket;
 	char *address;
@@ -34,17 +39,12 @@ typedef struct s_main {
 	int port;
 	bool is_connected;
 	bool is_closing;
-
-	EVP_PKEY *pubkey;
 	cJSON *server_response;
-
 	pthread_mutex_t lock;
 	pthread_cond_t cond;
 	bool has_new_data;
 	t_keys keys;
 
-	unsigned char aes_key[AES_KEY_SIZE];
-    unsigned char aes_iv[AES_IV_SIZE];
 }				t_main;
 
 typedef struct s_user {
@@ -73,18 +73,22 @@ t_main *mx_create_main_data(const char *address, int port);
 void mx_free_main_data(t_main *main);
 
 //func json request
-cJSON *form_login_request_test(const char *login, const char *password);
+cJSON *form_login_request(const char *login, const char *password);
 cJSON *form_aes_key_transfer(const unsigned char *aes_key, const unsigned char *iv, EVP_PKEY *pubkey);
+void send_request(t_request *reg, int socket);
 
 //Base64
 char *base64_encode(const unsigned char *input, size_t input_len);
 unsigned char *base64_decode(const char *input, size_t *output_len);
 
+//request utils func
+t_request *create_request(const char *data);
+void free_request(t_request *req);
+
 //test func
 t_user *mx_create_client(void);
 void mx_print_client(const t_user *client);
 void mx_free_client(t_user *client);
-
 void test_base64_encoding(t_main *main_data);
 
 

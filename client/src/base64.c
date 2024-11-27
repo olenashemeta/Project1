@@ -14,7 +14,6 @@ char *base64_encode(const unsigned char *input, size_t input_len) {
     BIO_flush(b64);
     BIO_get_mem_ptr(b64, &buffer_ptr);
 
-    // Создаем копию строки Base64
     char *base64_str = (char *)malloc(buffer_ptr->length + 1);
     if (!base64_str) {
         BIO_free_all(b64);
@@ -60,15 +59,13 @@ void test_base64_encoding(t_main *main_data) {
         return;
     }
 
-    // 1. Вывод оригинального AES-ключа
     printf("Original AES key: ");
     for (int i = 0; i < AES_KEY_SIZE; i++) {
         printf("%02X", main_data->keys.aes_key[i]);
     }
     printf("\n");
 
-    // 2. Шифрование AES-ключа открытым ключом RSA
-    unsigned char encrypted_key[256]; // Буфер для зашифрованного ключа
+    unsigned char encrypted_key[256];
     int encrypted_key_len = encrypt_aes_key(main_data->keys.pkey, main_data->keys.aes_key, encrypted_key);
 
     if (encrypted_key_len == -1) {
@@ -82,7 +79,6 @@ void test_base64_encoding(t_main *main_data) {
     }
     printf("\n");
 
-    // 3. Кодирование зашифрованного ключа в Base64
     char *encoded_key = base64_encode(encrypted_key, encrypted_key_len);
     if (!encoded_key) {
         printf("Failed to encode AES key to Base64\n");
@@ -90,7 +86,6 @@ void test_base64_encoding(t_main *main_data) {
     }
     printf("Base64-encoded AES key: %s\n", encoded_key);
 
-    // 4. Декодирование ключа из Base64
     size_t decoded_key_len;
     unsigned char *decoded_key = base64_decode(encoded_key, &decoded_key_len);
     if (!decoded_key) {
@@ -105,8 +100,6 @@ void test_base64_encoding(t_main *main_data) {
     }
     printf("\n");
 
-
-    // Освобождение памяти
     free(encoded_key);
     free(decoded_key);
 }

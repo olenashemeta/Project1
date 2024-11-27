@@ -14,7 +14,7 @@ static void on_login_button_clicked(GtkButton *button, gpointer user_data) {
     mx_print_client(user);
     
 
-    //cJSON *login_request = form_login_request_test(main->aes_key, main->aes_iv, user->login, user->password);
+    cJSON *login_request = form_login_request(user->login, user->password);
     //if (!login_request) {
     //    fprintf(stderr, "Failed to create login request JSON\n");
     //    return;
