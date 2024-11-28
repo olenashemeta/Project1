@@ -45,8 +45,8 @@ void handle_login_request(cJSON *json) {
         return;
     }
 
-    unsigned char iv[AES_IV_SIZE];
-    int iv_len = mx_hex_to_bytes(iv_hex, iv, sizeof(iv));
+    unsigned char iv[AES_IV_SIZEall -I../libs/libmx/ -I../libs/Sqlite3Lib/ -I./src -I./src/database -I./src/database/crud/db_crud -I./src/database/crud/model_crud -I./src/database/migrations -I./src/model_functions
+s(iv_hex, iv, sizeof(iv));
     if (iv_len == -1) {
         syslog(LOG_ERR, "Invalid IV length");
         cJSON_Delete(json);
@@ -66,3 +66,27 @@ void handle_login_request(cJSON *json) {
 
     cJSON_Delete(json);
 }*/
+
+void handle_login_request(cJSON *json_payload) {
+    if (!json_payload) {
+        syslog(LOG_ERR, "Invalid JSON payload in handle_login_request");
+        return;
+    }
+
+    cJSON *login_item = cJSON_GetObjectItemCaseSensitive(json_payload, "userlogin");
+    if (!cJSON_IsString(login_item) || !login_item->valuestring) {
+        syslog(LOG_ERR, "Missing or invalid 'userlogin' in login request");
+        return;
+    }
+    const char *userlogin = login_item->valuestring;
+
+    cJSON *password_item = cJSON_GetObjectItemCaseSensitive(json_payload, "password");
+    if (!cJSON_IsString(password_item) || !password_item->valuestring) {
+        syslog(LOG_ERR, "Missing or invalid 'password' in login request");
+        return;
+    }
+    const char *password = password_item->valuestring;
+
+    syslog(LOG_INFO, "Login request received. Userlogin: %s, Userpassword: %s", userlogin, password);
+
+}

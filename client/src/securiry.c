@@ -230,6 +230,7 @@ int mx_transfer_aes_key(t_main *main) {
     return 0;
 }
 
+/*
 unsigned char *encrypt_json_with_aes(const unsigned char *aes_key, const unsigned char *iv, cJSON *json, size_t *out_len) {
     if (!aes_key || !iv || !json || !out_len) {
         fprintf(stderr, "Invalid argument(s) to encrypt_json_with_aes\n");
@@ -292,6 +293,74 @@ unsigned char *encrypt_json_with_aes(const unsigned char *aes_key, const unsigne
     free(json_string);
 
     *out_len = total_len;
+    return encrypted_data;
+}
+*/
+
+unsigned char *encrypt_json_with_aes(const unsigned char *aes_key, const unsigned char *iv, 
+                                     cJSON *json, size_t *out_len) {
+    if (!aes_key || !iv || !json || !out_len) {
+        fprintf(stderr, "Invalid argument(s) to encrypt_json_with_aes\n");
+        return NULL;
+    }
+
+    char *json_string = cJSON_PrintUnformatted(json);
+    if (!json_string) {
+        fprintf(stderr, "Failed to convert JSON to string\n");
+        return NULL;
+    }
+
+    printf("JSON string to encrypt: %s\n", json_string);
+
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+    if (!ctx) {
+        fprintf(stderr, "Failed to create EVP_CIPHER_CTX\n");
+        free(json_string);
+        return NULL;
+    }
+
+    if (EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, aes_key, iv) != 1) {
+        fprintf(stderr, "EVP_EncryptInit_ex failed\n");
+        EVP_CIPHER_CTX_free(ctx);
+        free(json_string);
+        return NULL;
+    }
+
+    size_t json_len = strlen(json_string);
+    size_t block_size = EVP_CIPHER_block_size(EVP_aes_256_cbc());
+    size_t encrypted_data_len = json_len + block_size;
+
+    unsigned char *encrypted_data = (unsigned char *)malloc(encrypted_data_len);
+    if (!encrypted_data) {
+        fprintf(stderr, "Failed to allocate memory for encrypted data\n");
+        EVP_CIPHER_CTX_free(ctx);
+        free(json_string);
+        return NULL;
+    }
+
+    int bytes_written = 0, final_bytes_written = 0;
+
+    if (EVP_EncryptUpdate(ctx, encrypted_data, &bytes_written, 
+                          (unsigned char *)json_string, json_len) != 1) {
+        fprintf(stderr, "EVP_EncryptUpdate failed\n");
+        EVP_CIPHER_CTX_free(ctx);
+        free(json_string);
+        free(encrypted_data);
+        return NULL;
+    }
+
+    if (EVP_EncryptFinal_ex(ctx, encrypted_data + bytes_written, &final_bytes_written) != 1) {
+        fprintf(stderr, "EVP_EncryptFinal_ex failed\n");
+        EVP_CIPHER_CTX_free(ctx);
+        free(json_string);
+        free(encrypted_data);
+        return NULL;
+    }
+
+    *out_len = bytes_written + final_bytes_written; 
+    EVP_CIPHER_CTX_free(ctx);
+    free(json_string);
+
     return encrypted_data;
 }
 

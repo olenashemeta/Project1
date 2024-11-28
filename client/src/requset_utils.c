@@ -23,8 +23,10 @@ t_request *create_request(const char *data, size_t data_len) {
 
 void free_request(t_request *req) {
     if (req) {
-        free(req->data);
-        req->data = NULL;
+        if (req->data) {
+            free(req->data);
+            req->data = NULL;
+        }
         free(req);
     }
 }

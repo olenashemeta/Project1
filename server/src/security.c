@@ -322,32 +322,66 @@ int aes_encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
     return ciphertext_len;
 }
 
-int aes_decrypt(const unsigned char *encrypted_data, int encrypted_len, const unsigned char *aes_key,
-                const unsigned char *iv, unsigned char *decrypted_data) {
+int decrypt_received_data(t_receive *data, const unsigned char *aes_key, const unsigned char *iv) {
+    if (!data || !aes_key || !iv) {
+        syslog(LOG_ERR, "Invalid argument(s) to decrypt_received_data");
+        return -1;
+    }
+
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-    if (!ctx) return -1;
-    
-    int len;
-    int plaintext_len = 0;
+    if (!ctx) {
+        syslog(LOG_ERR, "Failed to create EVP_CIPHER_CTX");
+        return -1;
+    }
 
     if (EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, aes_key, iv) != 1) {
+        syslog(LOG_ERR, "EVP_DecryptInit_ex failed");
         EVP_CIPHER_CTX_free(ctx);
         return -1;
     }
 
-    if (EVP_DecryptUpdate(ctx, decrypted_data, &len, encrypted_data, encrypted_len) != 1) {
+    size_t block_size = EVP_CIPHER_block_size(EVP_aes_256_cbc());
+    size_t decrypted_data_len = data->len + block_size;
+    unsigned char *decrypted_data = (unsigned char *)malloc(decrypted_data_len);
+    if (!decrypted_data) {
+        syslog(LOG_ERR, "Failed to allocate memory for decrypted data");
         EVP_CIPHER_CTX_free(ctx);
         return -1;
     }
-    plaintext_len = len;
 
-    if (EVP_DecryptFinal_ex(ctx, decrypted_data + len, &len) != 1) {
+    int bytes_written = 0, final_bytes_written = 0;
+    if (EVP_DecryptUpdate(ctx, decrypted_data, &bytes_written, (unsigned char *)data->data, data->len) != 1) {
+        syslog(LOG_ERR, "EVP_DecryptUpdate failed");
         EVP_CIPHER_CTX_free(ctx);
+        free(decrypted_data);
         return -1;
     }
-    plaintext_len += len;
+
+    if (EVP_DecryptFinal_ex(ctx, decrypted_data + bytes_written, &final_bytes_written) != 1) {
+        syslog(LOG_ERR, "EVP_DecryptFinal_ex failed");
+        EVP_CIPHER_CTX_free(ctx);
+        free(decrypted_data);
+        return -1;
+    }
 
     EVP_CIPHER_CTX_free(ctx);
-    return plaintext_len;
-}
 
+    size_t total_decrypted_len = bytes_written + final_bytes_written;
+
+    free(data->data);
+    data->data = (char *)malloc(total_decrypted_len + 1); 
+    if (!data->data) {
+        syslog(LOG_ERR, "Failed to allocate memory for decrypted data in structure");
+        free(decrypted_data);
+        return -1;
+    }
+
+    memcpy(data->data, decrypted_data, total_decrypted_len);
+    data->data[total_decrypted_len] = '\0';
+    data->len = total_decrypted_len;
+
+    free(decrypted_data);
+    syslog(LOG_INFO, "Data successfully decrypted and updated in the structure");
+
+    return 0;
+}
