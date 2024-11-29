@@ -160,7 +160,6 @@ int start_server(t_server *server, const char *port);
 
 //Func to communicate with the client
 void *handle_client(void *arg);
-void mx_process_client_request(cJSON* json);
 void handle_login_request(cJSON* json);
 t_client *create_new_client(int socket_fd);
 void free_client(t_client *client);
