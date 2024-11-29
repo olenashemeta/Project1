@@ -1,13 +1,24 @@
 #include "../inc/server.h"
 
 void mx_daemon_start(void) {
+    char current_dir[PATH_MAX];
+    if (!getcwd(current_dir, sizeof(current_dir))) {
+        perror("getcwd failed");
+        exit(EXIT_FAILURE);
+    }
+
     if (daemon(0, 0) == -1) {
         perror("daemon failed");
         exit(EXIT_FAILURE);
     }
 
+    if (chdir(current_dir) == -1) {
+        perror("chdir failed");
+        exit(EXIT_FAILURE);
+    }
+
     openlog("UchatServer", LOG_PID, LOG_DAEMON);
-    syslog(LOG_INFO, "Daemon started");
+    syslog(LOG_INFO, "Daemon started in directory: %s", current_dir);
 }
 
 void mx_daemon_end(int signal, siginfo_t *info, void *context) {
