@@ -35,7 +35,7 @@ void on_create_account_button_clicked(GtkWidget *button, gpointer data) {
 
     GtkWidget *submit_create_account_button = gtk_button_new_with_label("Submit Account");
     gtk_widget_set_name(submit_create_account_button, "submit-create-account-button");
-    GtkWidget *back_to_login_button = gtk_button_new_with_label("Back to Login");
+    GtkWidget *back_to_login_button = gtk_button_new_with_label("Back to Log In");
     gtk_widget_set_name(back_to_login_button, "back-to-login-button");
 
     gtk_box_pack_start(GTK_BOX(vbox), create_account_label, FALSE, FALSE, 5);

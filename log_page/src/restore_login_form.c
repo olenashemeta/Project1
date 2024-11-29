@@ -8,7 +8,7 @@ void restore_login_form(GtkWidget *button, gpointer data) {
         gtk_widget_destroy(GTK_WIDGET(l->data));
     }
 
-    GtkWidget *title_label = gtk_label_new("Log Page");
+    GtkWidget *title_label = gtk_label_new("Log In");
     gtk_widget_set_name(title_label, "title-label");
     gtk_label_set_xalign(GTK_LABEL(title_label), 0.5);
     gtk_box_pack_start(GTK_BOX(vbox), title_label, FALSE, FALSE, 5);
@@ -29,7 +29,7 @@ void restore_login_form(GtkWidget *button, gpointer data) {
     gtk_box_pack_start(GTK_BOX(vbox), password_entry, FALSE, FALSE, 5);
     gtk_box_pack_start(GTK_BOX(vbox), error_label, FALSE, FALSE, 5);
 
-    GtkWidget *login_button = gtk_button_new_with_label("Login");
+    GtkWidget *login_button = gtk_button_new_with_label("Enter hire");
     gtk_box_pack_start(GTK_BOX(vbox), login_button, FALSE, FALSE, 5);
 
     g_object_set_data(G_OBJECT(login_button), "username_entry", username_entry);
@@ -38,7 +38,7 @@ void restore_login_form(GtkWidget *button, gpointer data) {
 
     g_signal_connect(login_button, "clicked", G_CALLBACK(on_login_button_clicked), NULL);
 
-    GtkWidget *create_account_button = gtk_button_new_with_label("Create Account");
+    GtkWidget *create_account_button = gtk_button_new_with_label("Become *a* membeer");
     gtk_widget_set_name(create_account_button, "create-account");
     gtk_box_pack_start(GTK_BOX(vbox), create_account_button, FALSE, FALSE, 5);
 

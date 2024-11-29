@@ -1,57 +1,59 @@
 
 #main-window {
-    background-image: url('back_small_light_brown.png'); 
+    background-image: url('img/back_of_page.svg'); 
     background-size: cover; 
     background-position: center; 
     background-repeat: no-repeat;
 }
+
 #title-label{
-    color: #3b2103;          
+    color: white;          
     font-weight: bold;    
-    font-size: 20px; 
+    font-size: 30px; 
 }
 
 #label-create-account{
-    color: #3b2103;          
+    color: white;          
     font-weight: bold;    
     font-size: 20px; 
 }
 
-#entry{
+#entry {
     color: #3b2103; 
-    border: none;
+    border: 2px solid black; 
     border-radius: 15px;
     padding: 10px 20px; 
     font-size: 14px;
 }
 
-#create{
+#create {
     color: #3b2103; 
-    border: none;
+    border: 3px solid black; 
     border-radius: 15px;
     padding: 10px 15px; 
     font-size: 14px;
 }
 
 button {
-    background-image: url('buttom_cover.png');
+    background-image: url('img/buttom_cover1.png');
     background-size: cover; 
     background-position: center; 
     background-repeat: no-repeat;
     color: white; 
-    border: none;
+    border: 2px solid black;
     border-radius: 15px;
     padding: 10px 20px; 
     font-size: 16px;
 }
 
 button:hover {
-    background-image: url('buttom_cover_hover.png');
+    background-image: url('img/buttom_cover_hover1.png');
     background-size: cover; 
     background-position: center; 
     background-repeat: no-repeat;    
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); 
+    box-shadow: 0 6px 8px rgba(14, 3, 78, 0.2); 
 }
+
 
 #error-label {
     color: #961717;

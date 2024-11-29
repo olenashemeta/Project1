@@ -15,10 +15,9 @@ void create_log_page(int argc, char *argv[]) {
 
     GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
 
-    // Add title label
-    GtkWidget *title_label = gtk_label_new("Log Page");
+    GtkWidget *title_label = gtk_label_new("Log In");
     gtk_widget_set_name(title_label, "title-label");
-    gtk_label_set_xalign(GTK_LABEL(title_label), 0.5); // Center the title
+    gtk_label_set_xalign(GTK_LABEL(title_label), 0.5);
     gtk_box_pack_start(GTK_BOX(vbox), title_label, FALSE, FALSE, 5);
 
     GtkWidget *username_entry = gtk_entry_new();
@@ -37,7 +36,7 @@ void create_log_page(int argc, char *argv[]) {
     gtk_widget_set_name(error_label, "error-label");
     gtk_box_pack_start(GTK_BOX(vbox), error_label, FALSE, FALSE, 5);
 
-    GtkWidget *login_button = gtk_button_new_with_label("Login");
+    GtkWidget *login_button = gtk_button_new_with_label("Enter hire");
     gtk_box_pack_start(GTK_BOX(vbox), login_button, FALSE, FALSE, 5);
 
     g_object_set_data(G_OBJECT(login_button), "username_entry", username_entry);
@@ -46,7 +45,7 @@ void create_log_page(int argc, char *argv[]) {
 
     g_signal_connect(login_button, "clicked", G_CALLBACK(on_login_button_clicked), NULL);
 
-    GtkWidget *create_account_button = gtk_button_new_with_label("Create Account");
+    GtkWidget *create_account_button = gtk_button_new_with_label("Become *a* membeer");
     gtk_widget_set_name(create_account_button, "create-account"); 
     gtk_box_pack_start(GTK_BOX(vbox), create_account_button, FALSE, FALSE, 5);
 
