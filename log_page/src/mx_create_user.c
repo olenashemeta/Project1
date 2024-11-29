@@ -1,4 +1,4 @@
-#include "log_page.h"
+#include "../inc/log_page.h"
 
 t_user* mx_create_user(const char* login, const char* name, const char* password) {
     t_user* new_user = (t_user*)malloc(sizeof(t_user));

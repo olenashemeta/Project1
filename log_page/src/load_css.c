@@ -1,4 +1,4 @@
-#include "log_page.h"
+#include "../inc/log_page.h"
 
 void load_css(GtkWidget *window) {
     GtkCssProvider *provider;

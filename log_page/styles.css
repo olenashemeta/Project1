@@ -18,7 +18,7 @@
     font-size: 20px; 
 }
 
-#entry {
+#username_entry, #password_entry, #login_entry, #confirm_password_entry{
     color: #3b2103; 
     border: 2px solid black; 
     border-radius: 15px;
@@ -26,16 +26,8 @@
     font-size: 14px;
 }
 
-#create {
-    color: #3b2103; 
-    border: 3px solid black; 
-    border-radius: 15px;
-    padding: 10px 15px; 
-    font-size: 14px;
-}
-
-button {
-    background-image: url('img/buttom_cover1.png');
+#create_account_button, #login_button, #submit_create_account_button,  #back_to_login_button{
+    background-color: #372d10;
     background-size: cover; 
     background-position: center; 
     background-repeat: no-repeat;
@@ -44,16 +36,16 @@ button {
     border-radius: 15px;
     padding: 10px 20px; 
     font-size: 16px;
+    font-weight: bold;
 }
 
-button:hover {
-    background-image: url('img/buttom_cover_hover1.png');
+#create_account_button:hover, #login_button:hover, #submit_create_account_button:hover,  #back_to_login_button:hover {
+    background-color: #534005;
     background-size: cover; 
     background-position: center; 
     background-repeat: no-repeat;    
     box-shadow: 0 6px 8px rgba(14, 3, 78, 0.2); 
 }
-
 
 #error-label {
     color: #961717;

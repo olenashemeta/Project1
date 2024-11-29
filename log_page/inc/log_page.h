@@ -4,6 +4,8 @@
 #include <gtk/gtk.h>
 #include "../libmx/inc/libmx.h"
 
+#define MAX_SIZE 1000
+
 typedef struct s_user {
     char* login;
     char* name;

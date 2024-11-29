@@ -1,4 +1,4 @@
-#include "log_page.h"
+#include "../inc/log_page.h"
 
 void restore_login_form(GtkWidget *button, gpointer data) {
     GtkWidget *vbox = GTK_WIDGET(data);
@@ -15,11 +15,11 @@ void restore_login_form(GtkWidget *button, gpointer data) {
 
     GtkWidget *username_entry = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(username_entry), "Enter your login");
-    gtk_widget_set_name(username_entry, "entry"); 
+    gtk_widget_set_name(username_entry, "username_entry"); 
 
     GtkWidget *password_entry = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(password_entry), "Enter your password");
-    gtk_widget_set_name(password_entry, "entry"); 
+    gtk_widget_set_name(password_entry, "password_entry"); 
     gtk_entry_set_visibility(GTK_ENTRY(password_entry), FALSE);
 
     GtkWidget *error_label = gtk_label_new("");
@@ -29,7 +29,8 @@ void restore_login_form(GtkWidget *button, gpointer data) {
     gtk_box_pack_start(GTK_BOX(vbox), password_entry, FALSE, FALSE, 5);
     gtk_box_pack_start(GTK_BOX(vbox), error_label, FALSE, FALSE, 5);
 
-    GtkWidget *login_button = gtk_button_new_with_label("Enter hire");
+    GtkWidget *login_button = gtk_button_new_with_label("Enter hive");
+    gtk_widget_set_name(login_button, "login_button");
     gtk_box_pack_start(GTK_BOX(vbox), login_button, FALSE, FALSE, 5);
 
     g_object_set_data(G_OBJECT(login_button), "username_entry", username_entry);
@@ -38,8 +39,8 @@ void restore_login_form(GtkWidget *button, gpointer data) {
 
     g_signal_connect(login_button, "clicked", G_CALLBACK(on_login_button_clicked), NULL);
 
-    GtkWidget *create_account_button = gtk_button_new_with_label("Become *a* membeer");
-    gtk_widget_set_name(create_account_button, "create-account");
+    GtkWidget *create_account_button = gtk_button_new_with_label("Beecome membeer");
+    gtk_widget_set_name(create_account_button, "create_account_button");
     gtk_box_pack_start(GTK_BOX(vbox), create_account_button, FALSE, FALSE, 5);
 
     g_signal_connect(create_account_button, "clicked", G_CALLBACK(on_create_account_button_clicked), vbox);

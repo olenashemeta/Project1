@@ -1,4 +1,4 @@
-#include "log_page.h"
+#include "../inc/log_page.h"
 
 void on_login_button_clicked(GtkWidget *button, gpointer data) {
     GtkWidget *username_entry = GTK_WIDGET(g_object_get_data(G_OBJECT(button), "username_entry"));

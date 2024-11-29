@@ -1,4 +1,4 @@
-#include "log_page.h"
+#include "../inc/log_page.h"
 
 void mx_free_user(t_user* new_user){
     if (new_user != NULL) {
