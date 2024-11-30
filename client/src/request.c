@@ -23,7 +23,6 @@ cJSON *form_login_request(const char *login, const char *password) {
     cJSON_AddStringToObject(json_payload, "userlogin", hash_login_b64);
     cJSON_AddStringToObject(json_payload, "password", hash_password_b64);
 
-
     free(hash_password_b64);
     free(hash_login_b64);
 
@@ -70,28 +69,4 @@ cJSON *form_aes_key_transfer(const unsigned char *aes_key, const unsigned char *
     return json_payload;
 }
 
-void prepare_and_send_json(cJSON *json_payload, t_main *main) {
-    if (!main || !json_payload) {
-        fprintf(stderr, "Invalid arguments to prepare_and_send_json\n");
-        return;
-    }
 
-    size_t encrypted_data_len;
-    unsigned char *encrypted_data = encrypt_json_with_aes(main->keys.aes_key, main->keys.aes_iv, json_payload, &encrypted_data_len);
-    if (!encrypted_data) {
-        fprintf(stderr, "Failed to encrypt JSON object\n");
-        cJSON_Delete(json_payload);
-        return;
-    }
-
-    if (main->is_connected) {
-        t_packet *req = create_request((char *)encrypted_data, encrypted_data_len);
-        if (req) {
-            send_request(req, main->socket);
-            free_request(req);
-        }
-    }
-
-    cJSON_Delete(json_payload);
-    free(encrypted_data);
-}

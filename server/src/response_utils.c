@@ -52,3 +52,30 @@ void free_receive(t_packet *receive) {
     }
 }
 
+void prepare_and_send_json(cJSON *json_payload, t_client *client) {
+    if (!client || !json_payload) {
+        fprintf(stderr, "Invalid arguments to prepare_and_send_json\n");
+        return;
+    }
+
+    size_t encrypted_data_len;
+    unsigned char *encrypted_data = encrypt_json_with_aes(client->keys.aes_key, client->keys.aes_iv, json_payload, &encrypted_data_len);
+    if (!encrypted_data) {
+        fprintf(stderr, "Failed to encrypt JSON object\n");
+        cJSON_Delete(json_payload);
+        return;
+    }
+    /*
+    if (main->is_connected) {
+        t_packet *req = create_request((char *)encrypted_data, encrypted_data_len);
+        if (req) {
+            send_request(req, main->socket);
+            free_request(req);
+        }
+    }
+    */
+    cJSON_Delete(json_payload);
+    free(encrypted_data);
+}
+
+

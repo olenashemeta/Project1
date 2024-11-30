@@ -39,6 +39,7 @@ typedef struct s_client {
 	pthread_t thread_id;
 	int socket_fd;
 	t_keys keys;
+	int id_db;
 }              t_client;
 
 typedef struct s_server {
@@ -166,8 +167,8 @@ void free_client(t_client *client);
 void process_request(t_packet *receive_data);
 
 //security func
-int aes_encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
-                unsigned char *iv, unsigned char *ciphertext);
+unsigned char *encrypt_json_with_aes(const unsigned char *aes_key, const unsigned char *iv, 
+                                     cJSON *json, size_t *out_len);
 int rsa_decrypt_aes_key(EVP_PKEY *private_key, const unsigned char *encrypted_aes_key, size_t encrypted_len, 
                         unsigned char **decrypted_key, size_t *decrypted_key_len);
 int generate_rsa_keys(t_keys *keys);

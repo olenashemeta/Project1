@@ -67,7 +67,6 @@ unsigned char *encrypt_json_with_aes(const unsigned char *aes_key, const unsigne
                                      cJSON *json, size_t *out_len);
 int encrypt_aes_key(EVP_PKEY *pubkey, const unsigned char *aes_key, unsigned char *encrypted_key);
 
-int aes_encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key, unsigned char *iv, unsigned char *ciphertext);
 int decrypt_received_data(t_packet *data, const unsigned char *aes_key, const unsigned char *iv);
 
 //UI func
@@ -80,21 +79,21 @@ void mx_free_main_data(t_main *main);
 //func json request
 cJSON *form_login_request(const char *login, const char *password);
 cJSON *form_aes_key_transfer(const unsigned char *aes_key, const unsigned char *iv, EVP_PKEY *pubkey);
-void prepare_and_send_json(cJSON *json_payload, t_main *main);
-void send_request(t_packet *reg, int socket);
+
 
 //Base64
 char *base64_encode(const unsigned char *input, size_t input_len);
 unsigned char *base64_decode(const char *input, size_t *output_len);
 
 //request utils func
-t_packet *create_request(const char *data, size_t data_len);
-void free_request(t_packet *req);
+t_packet *create_message(const char *data, size_t data_len);
+void free_message(t_packet *req);
+void prepare_and_send_json(cJSON *json_payload, t_main *main);
+void send_message(t_packet *reg, int socket);
 
 //receiving a response from the server
-t_packet *receive_request(int socket_fd);
+t_packet *receive_message(int socket_fd);
 t_packet *create_receive(int len, const char *data);
-void free_receive(t_packet *receive);
 
 //test func
 t_user *mx_create_client(void);

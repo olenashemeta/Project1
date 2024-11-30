@@ -24,16 +24,16 @@ static void *connection(void *arg) {
         printf("Handshake succeeded. AES session established.\n");
 
         t_packet *received_data = NULL;
-        while (!main->is_closing && (received_data = receive_request(main->socket)) != NULL) {
+        while (!main->is_closing && (received_data = receive_message(main->socket)) != NULL) {
             if (decrypt_received_data(received_data, main->keys.aes_key, main->keys.aes_iv) == -1) {
                 fprintf(stderr, "Failed to decrypt data\n");
-                free_receive(received_data);
+                free_message(received_data);
                 break;
             }
 
             process_response(received_data);
 
-            free_receive(received_data);
+            free_message(received_data);
 
             // pthread_mutex_lock(&main->lock);
             // cJSON_Delete(main->server_response);

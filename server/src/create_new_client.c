@@ -21,6 +21,7 @@ t_client *create_new_client(int socket_fd) {
 
     client->socket_fd = socket_fd;
     client->thread_id = 0;
+    client->id_db = 0;
 
     client->keys.pkey = NULL;
 
