@@ -13,23 +13,28 @@ void on_create_account_button_clicked(GtkWidget *button, gpointer data) {
 
     GtkWidget *create_account_label = gtk_label_new("Create Account");
     gtk_widget_set_name(create_account_label, "title-label");
+
     GtkWidget *username_entry = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(username_entry), "Enter username");
     gtk_widget_set_name(username_entry, "username_entry"); 
+    gtk_entry_set_max_length(GTK_ENTRY(username_entry), 100); 
 
     GtkWidget *login_entry = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(login_entry), "Enter login");
-    gtk_widget_set_name(login_entry, "login_entry"); 
+    gtk_widget_set_name(login_entry, "login_entry");
+    gtk_entry_set_max_length(GTK_ENTRY(login_entry), 100); 
 
     GtkWidget *password_entry = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(password_entry), "Enter password"); 
     gtk_widget_set_name(password_entry, "password_entry");  
     gtk_entry_set_visibility(GTK_ENTRY(password_entry), FALSE);
+    gtk_entry_set_max_length(GTK_ENTRY(password_entry), 100); 
 
     GtkWidget *confirm_password_entry = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(confirm_password_entry), "Enter password again");
      gtk_widget_set_name(confirm_password_entry, "confirm_password_entry");
     gtk_entry_set_visibility(GTK_ENTRY(confirm_password_entry), FALSE); 
+        gtk_entry_set_max_length(GTK_ENTRY(confirm_password_entry), 100); 
 
     GtkWidget *error_label = gtk_label_new("");
     gtk_widget_set_name(error_label, "error_label");

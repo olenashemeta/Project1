@@ -20,13 +20,7 @@ void on_submit_account_button_clicked(GtkWidget *button, gpointer data) {
         gtk_label_set_text(GTK_LABEL(error_label), "Fill in all fields");
         return;
     }
-    //log 1000
-    if (mx_strlen(login) > MAX_SIZE) {
-        gtk_label_set_text(GTK_LABEL(error_label), "Login must be\nless than 1000 characters");
-        return;
-    } else {
-        gtk_label_set_text(GTK_LABEL(error_label), ""); 
-    }
+
     // pas 8
     if (mx_strlen(password) < 8) {
         gtk_label_set_text(GTK_LABEL(error_label), "Password must be\nlonger than 8 characters");
@@ -34,14 +28,7 @@ void on_submit_account_button_clicked(GtkWidget *button, gpointer data) {
     } else {
         gtk_label_set_text(GTK_LABEL(error_label), ""); 
     }
-    // pas 1000
-    if (mx_strlen(password) > MAX_SIZE) {
-        gtk_label_set_text(GTK_LABEL(error_label), "Password must be\nless than 1000 characters");
-        return;
-    } else {
-        gtk_label_set_text(GTK_LABEL(error_label), ""); 
-    }
-
+    
     if (mx_strcmp(password, confirm_password) != 0) {
         gtk_label_set_text(GTK_LABEL(error_label), "Passwords don't match!");
         return;
