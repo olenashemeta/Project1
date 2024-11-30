@@ -15,14 +15,31 @@ t_list* db_user_read_by_group_id(int id) {
 }
 
 t_list* db_group_read_by_user_id(int id) {
+	char* select = NULL;
 	char* where = NULL;
-	asprintf(&where, "users_groups.user_id = %d", id);
 
-	t_list* list = database_read("groups.id, groups.name, groups.created_by, users.username, groups.created_at", "groups INNER JOIN users_groups ON groups.id = users_groups.group_id INNER JOIN users on users.id = users_groups.user_id", where);
+	asprintf(&select, "groups.id,"
+		"CAST("
+			"CASE "
+			"WHEN groups.is_private = 1 "
+			"THEN(SELECT username FROM users INNER JOIN users_groups ON users.id = users_groups.user_id WHERE users_groups.group_id = groups.id AND users.id != %d) "
+			"ELSE groups.name "
+			"END AS nvarchar(250)) as[name], "
+		"groups.is_private, groups.created_by, "
+		"(SELECT username FROM users WHERE id = created_by) as username, "
+		"groups.created_at, max(messages.created_at) as last_message ", id);
+
+	asprintf(&where, "users_groups.user_id = %d "
+		"GROUP BY groups.id ", id);
+
+	t_list* list = database_read(select, " groups INNER JOIN users_groups ON groups.id = users_groups.group_id "
+		"INNER JOIN users ON users.id = users_groups.user_id "
+		"LEFT JOIN messages ON groups.id = messages.group_id ", where);
 	t_list* ret = group_list_from_data_list(list);
 
 	mx_del_list(list, mx_list_size(list));
-
+	
+	mx_strdel(&select);
 	mx_strdel(&where);
 
 	return ret;

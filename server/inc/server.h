@@ -68,6 +68,7 @@ typedef struct s_message {
 typedef struct s_group {
 	int id;
 	char* name;
+	int is_private;
 	int created_by;
 	char* creator_username;
 	char* created_at;
@@ -145,7 +146,7 @@ void free_message(t_message** message);
 void free_message_list(t_list* list);
 
 t_group* group_from_data_list(t_list* list);
-t_group* group_create(const char* name, int created_by);
+t_group* group_create(const char* name, int created_by, int is_private);
 t_list* group_list_from_data_list(t_list* list);
 void free_group(t_group** group);
 void free_group_list(t_list* list);

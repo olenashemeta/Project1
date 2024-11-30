@@ -2,7 +2,7 @@
 
 t_group* group_from_data_list(t_list* list)
 {
-	if (mx_list_size(list) < 6)return NULL;
+	if (mx_list_size(list) < 7)return NULL;
 
 	t_group* ret = (t_group*)malloc(sizeof(t_group));
 
@@ -10,6 +10,9 @@ t_group* group_from_data_list(t_list* list)
 
 	list = list->next;
 	ret->name = (char*)list->data;
+
+	list = list->next;
+	ret->is_private = mx_atoi((char*)list->data);
 
 	list = list->next;
 	ret->created_by = mx_atoi((char*)list->data);
@@ -26,13 +29,15 @@ t_group* group_from_data_list(t_list* list)
 	return ret;
 }
 
-t_group* group_create(const char* name, int created_by)
+t_group* group_create(const char* name, int created_by, int is_private)
 {
 	t_group* ret = (t_group*)malloc(sizeof(t_group));
 
 	ret->id = 0;
 
 	ret->name = mx_strdup(name);
+
+	ret->is_private = is_private;
 
 	ret->created_by = created_by;
 
@@ -47,7 +52,7 @@ t_group* group_create(const char* name, int created_by)
 
 t_list* group_list_from_data_list(t_list* list)
 {
-	int size = mx_list_size(list) / 6;
+	int size = mx_list_size(list) / 7;
 	if (size < 1) return NULL;
 	t_list* ret = NULL;
 
@@ -60,6 +65,9 @@ t_list* group_list_from_data_list(t_list* list)
 		list = list->next;
 		g->name = (char*)list->data;
 
+		list = list->next;
+		g->is_private = mx_atoi((char*)list->data);
+		
 		list = list->next;
 		g->created_by = mx_atoi((char*)list->data);
 

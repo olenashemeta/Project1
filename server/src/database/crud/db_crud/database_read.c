@@ -3,7 +3,13 @@
 static int callback(void* data, int argc, char** argv, char** azColName) {
     t_list** list = (t_list**)data;
     for (int i = 0; i < argc; i++) {
-        mx_push_back(*(&list), mx_strdup(argv[i]));
+        if (mx_strlen(argv[i]) != 0) {
+            mx_push_back(*(&list), mx_strdup(argv[i]));
+        }
+        else {
+            mx_push_back(*(&list), mx_strdup("NULL"));
+        }
+
     }
     return 0;
 }
