@@ -8,6 +8,9 @@ void restore_login_form(GtkWidget *button, gpointer data) {
         gtk_widget_destroy(GTK_WIDGET(l->data));
     }
 
+    GtkWidget *logo = create_image("img/logo.svg", 110, 100);
+    gtk_box_pack_start(GTK_BOX(vbox), logo, FALSE, FALSE, 0);
+
     GtkWidget *title_label = gtk_label_new("Log In");
     gtk_widget_set_name(title_label, "title-label");
     gtk_label_set_xalign(GTK_LABEL(title_label), 0.5);

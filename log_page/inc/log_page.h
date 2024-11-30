@@ -2,6 +2,7 @@
 #define LOG_PAGE_H
 
 #include <gtk/gtk.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
 #include "../libmx/inc/libmx.h"
 
 #define MAX_SIZE 1000
@@ -21,6 +22,6 @@ void load_css(GtkWidget *window);
 void on_submit_account_button_clicked(GtkWidget *button, gpointer data);
 void on_login_button_clicked(GtkWidget *button, gpointer data);
 void restore_login_form(GtkWidget *button, gpointer data);
-
+GtkWidget* create_image(const char *image_path, int width, int height);
 
 #endif

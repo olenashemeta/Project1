@@ -8,6 +8,9 @@ void on_create_account_button_clicked(GtkWidget *button, gpointer data) {
         gtk_widget_destroy(GTK_WIDGET(l->data));
     }
 
+    GtkWidget *logo = create_image("img/logo.svg", 110, 100);
+    gtk_box_pack_start(GTK_BOX(vbox), logo, FALSE, FALSE, 0);
+
     GtkWidget *create_account_label = gtk_label_new("Create Account");
     gtk_widget_set_name(create_account_label, "title-label");
     GtkWidget *username_entry = gtk_entry_new();
