@@ -27,7 +27,7 @@
 }
 
 #create_account_button, #login_button, #submit_create_account_button,  #back_to_login_button{
-    background-color: #372d10;
+    background: #372d10;
     background-size: cover; 
     background-position: center; 
     background-repeat: no-repeat;
