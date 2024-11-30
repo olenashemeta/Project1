@@ -23,30 +23,24 @@ static void *connection(void *arg) {
 
         printf("Handshake succeeded. AES session established.\n");
 
-        while (!main->is_closing) {
-            char buffer[4096];
-            ssize_t bytes_received = recv(main->socket, buffer, sizeof(buffer) - 1, 0);
-            if (bytes_received <= 0) {
-                fprintf(stderr, "Connection lost. Reconnecting...\n");
-                close(main->socket);
-                main->is_connected = false;
+        t_packet *received_data = NULL;
+        while (!main->is_closing && (received_data = receive_request(main->socket)) != NULL) {
+            if (decrypt_received_data(received_data, main->keys.aes_key, main->keys.aes_iv) == -1) {
+                fprintf(stderr, "Failed to decrypt data\n");
+                free_receive(received_data);
                 break;
             }
 
-            buffer[bytes_received] = '\0';
+            process_response(received_data);
 
-            cJSON *json_response = cJSON_Parse(buffer);
-            if (!json_response) {
-                fprintf(stderr, "Failed to parse JSON response from server.\n");
-                continue;
-            }
+            free_receive(received_data);
 
-            pthread_mutex_lock(&main->lock);
-            cJSON_Delete(main->server_response);
-            main->server_response = json_response;
-            main->has_new_data = true;
-            pthread_cond_signal(&main->cond);
-            pthread_mutex_unlock(&main->lock);
+            // pthread_mutex_lock(&main->lock);
+            // cJSON_Delete(main->server_response);
+            // main->server_response = json_response;
+            // main->has_new_data = true;
+            // pthread_cond_signal(&main->cond);
+            // pthread_mutex_unlock(&main->lock);
         }
 
         close(main->socket);

@@ -12,7 +12,7 @@ void *handle_client(void *arg) {
         pthread_exit(NULL);
     }
 
-    t_receive *received_data = NULL;
+    t_packet *received_data = NULL;
 
     while ((received_data = receive_request(client->socket_fd)) != NULL) {
         if (decrypt_received_data(received_data, client->keys.aes_key, client->keys.aes_iv) == -1) {

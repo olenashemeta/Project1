@@ -1,5 +1,8 @@
 #include "../inc/client.h"
-void *connection(void *arg) {
+
+
+/*
+static void *connection(void *arg) {
     t_main *main = (t_main *)arg;
 
     while (!main->is_closing) {
@@ -55,3 +58,4 @@ void *connection(void *arg) {
     printf("Closing connection thread.\n");
     pthread_exit(NULL);
 }
+*/

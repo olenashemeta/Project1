@@ -322,7 +322,7 @@ int aes_encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
     return ciphertext_len;
 }
 
-int decrypt_received_data(t_receive *data, const unsigned char *aes_key, const unsigned char *iv) {
+int decrypt_received_data(t_packet *data, const unsigned char *aes_key, const unsigned char *iv) {
     if (!data || !aes_key || !iv) {
         syslog(LOG_ERR, "Invalid argument(s) to decrypt_received_data");
         return -1;

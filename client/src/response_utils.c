@@ -1,4 +1,4 @@
-#include "../inc/server.h"
+#include "../inc/client.h"
 
 t_packet *receive_request(int socket_fd) {
     size_t len;

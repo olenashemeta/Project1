@@ -30,10 +30,10 @@ typedef struct s_keys {
 	unsigned char aes_iv[AES_IV_SIZE];
 }				t_keys;
 
-typedef struct s_receive{
+typedef struct t_packet{
 	int len;
 	char *data;
-}				t_receive;
+}				t_packet;
 
 typedef struct s_client {
 	pthread_t thread_id;
@@ -163,7 +163,7 @@ void *handle_client(void *arg);
 void handle_login_request(cJSON* json);
 t_client *create_new_client(int socket_fd);
 void free_client(t_client *client);
-void process_request(t_receive *receive_data);
+void process_request(t_packet *receive_data);
 
 //security func
 int aes_encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
@@ -175,16 +175,16 @@ int rsa_keys_to_pem(EVP_PKEY *pkey, unsigned char **pubkey_pem, size_t *pubkey_l
                     unsigned char **privkey_pem, size_t *privkey_len);
 int mx_receive_aes(t_client *client, unsigned char *encrypted_aes_key, size_t *encrypted_key_len, unsigned char *iv);
 int handshake(t_client *client);
-int decrypt_received_data(t_receive *data, const unsigned char *aes_key, const unsigned char *iv);
+int decrypt_received_data(t_packet *data, const unsigned char *aes_key, const unsigned char *iv);
 
 //base64
 unsigned char *base64_decode(const char *input, size_t *output_len);
 char *base64_encode(const unsigned char *input, size_t input_len);
 
 //response utils func
-t_receive *receive_request(int socket_fd);
-t_receive *create_receive(int len, const char *data);
-void free_receive(t_receive *receive);
+t_packet *receive_request(int socket_fd);
+t_packet *create_receive(int len, const char *data);
+void free_receive(t_packet *receive);
 
 t_server *create_server(void);
 void free_server(t_server *server);

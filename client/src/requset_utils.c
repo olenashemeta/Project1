@@ -1,11 +1,11 @@
 #include "../inc/client.h"
 
-t_request *create_request(const char *data, size_t data_len) {
+t_packet *create_request(const char *data, size_t data_len) {
     if (!data || data_len == 0) {
         return NULL;
     }
 
-    t_request *request = malloc(sizeof(t_request));
+    t_packet *request = malloc(sizeof(t_packet));
     if (!request) {
         return NULL;
     }
@@ -21,7 +21,7 @@ t_request *create_request(const char *data, size_t data_len) {
     return request;
 }
 
-void free_request(t_request *req) {
+void free_request(t_packet *req) {
     if (req) {
         if (req->data) {
             free(req->data);
@@ -31,7 +31,7 @@ void free_request(t_request *req) {
     }
 }
 
-void send_request(t_request *req, int socket) {
+void send_request(t_packet *req, int socket) {
     if (!req) {
         return;
     }

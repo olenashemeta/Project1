@@ -85,7 +85,7 @@ void prepare_and_send_json(cJSON *json_payload, t_main *main) {
     }
 
     if (main->is_connected) {
-        t_request *req = create_request((char *)encrypted_data, encrypted_data_len);
+        t_packet *req = create_request((char *)encrypted_data, encrypted_data_len);
         if (req) {
             send_request(req, main->socket);
             free_request(req);
