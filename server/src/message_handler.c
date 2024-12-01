@@ -1,6 +1,6 @@
 #include "../inc/server.h"
 
-t_packet *receive_request(int socket_fd) {
+t_packet *receive_packet(int socket_fd) {
     size_t len;
 
     ssize_t rec_data = recv(socket_fd, &len, sizeof(len), 0);
@@ -8,41 +8,41 @@ t_packet *receive_request(int socket_fd) {
         return NULL;
     }
 
-    t_packet *data = create_receive(len, NULL);
+    t_packet *data = create_packet(NULL, len);
     if (!data) {
         return NULL;
     }
 
     rec_data = recv(socket_fd, data->data, data->len, 0);
     if (rec_data <= 0) {
-        free_receive(data);
+        free_packet(data);
         return NULL;
     }
 
     return data;
 }
 
-t_packet *create_receive(int len, const char *data) {
+t_packet *create_packet(const char *data, size_t data_len) {
     t_packet *receive = (t_packet *)malloc(sizeof(t_packet));
     if (!receive) {
         return NULL;
     }
     
-    receive->len = len;
-    receive->data = (char *)malloc(len);
+    receive->len = data_len;
+    receive->data = (char *)malloc(receive->len);
     if (!receive->data) {
         free(receive);
         return NULL;
     }
     
     if (data) {
-        memcpy(receive->data, data, len);
+        memcpy(receive->data, data, data_len); 
     }
 
     return receive;
 }
 
-void free_receive(t_packet *receive) {
+void free_packet(t_packet *receive) {
     if (receive) {
         if (receive->data) {
             free(receive->data);
@@ -50,6 +50,15 @@ void free_receive(t_packet *receive) {
         }
         free(receive);
     }
+}
+
+void send_message(t_packet *req, int socket) {
+    if (!req) {
+        return;
+    }
+
+    if (send(socket, &req->len, sizeof(req->len), 0) == -1 || send(socket, req->data, req->len, 0) == -1)
+        return;
 }
 
 void prepare_and_send_json(cJSON *json_payload, t_client *client) {
@@ -65,15 +74,15 @@ void prepare_and_send_json(cJSON *json_payload, t_client *client) {
         cJSON_Delete(json_payload);
         return;
     }
-    /*
-    if (main->is_connected) {
-        t_packet *req = create_request((char *)encrypted_data, encrypted_data_len);
-        if (req) {
-            send_request(req, main->socket);
-            free_request(req);
+
+    if (client->socket_fd > 0) {
+        t_packet *message = create_packet((char *)encrypted_data, encrypted_data_len);
+        if (message) {
+            send_message(message, client->socket_fd);
+            free_packet(message);
         }
     }
-    */
+
     cJSON_Delete(json_payload);
     free(encrypted_data);
 }

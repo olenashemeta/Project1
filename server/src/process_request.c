@@ -1,6 +1,6 @@
 #include "../inc/server.h"
-// передавання клієнтської інформації 
-void process_request(t_packet *receive_data) {
+
+void process_request(t_packet *receive_data, t_client *client) {
     if (!receive_data || !receive_data->data) {
         syslog(LOG_ERR, "Invalid t_receive structure in process_request");
         return;

@@ -164,7 +164,7 @@ void *handle_client(void *arg);
 void handle_login_request(cJSON* json);
 t_client *create_new_client(int socket_fd);
 void free_client(t_client *client);
-void process_request(t_packet *receive_data);
+void process_request(t_packet *receive_data, t_client *client);
 
 //security func
 unsigned char *encrypt_json_with_aes(const unsigned char *aes_key, const unsigned char *iv, 
@@ -183,9 +183,11 @@ unsigned char *base64_decode(const char *input, size_t *output_len);
 char *base64_encode(const unsigned char *input, size_t input_len);
 
 //response utils func
-t_packet *receive_request(int socket_fd);
-t_packet *create_receive(int len, const char *data);
-void free_receive(t_packet *receive);
+t_packet *receive_packet(int socket_fd);
+t_packet *create_packet(const char *data, size_t data_len);
+void free_packet(t_packet *receive);
+void send_message(t_packet *req, int socket);
+void prepare_and_send_json(cJSON *json_payload, t_client *client);
 
 t_server *create_server(void);
 void free_server(t_server *server);

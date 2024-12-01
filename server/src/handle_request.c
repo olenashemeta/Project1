@@ -21,5 +21,5 @@ void handle_login_request(cJSON *json_payload) {
     const char *password = password_item->valuestring;
 
     syslog(LOG_INFO, "Login request received. Userlogin: %s, Userpassword: %s", userlogin, password);
-
+    
 }

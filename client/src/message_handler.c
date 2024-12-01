@@ -23,10 +23,6 @@ t_packet *receive_message(int socket_fd) {
 }
 
 t_packet *create_message(const char *data, size_t data_len) {
-    if (!data || data_len == 0) {
-        return NULL;
-    }
-
     t_packet *request = malloc(sizeof(t_packet));
     if (!request) {
         return NULL;
