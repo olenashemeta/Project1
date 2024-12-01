@@ -1,0 +1,25 @@
+#settings_button {
+    background-color: white;
+    border: black;  /* Убираем рамку */
+    padding: 0;  /* Убираем внутренние отступы */
+}
+
+#settings_button:hover {
+    background-color: rgba(200, 200, 200, 1);
+}
+
+#settings_button:active {
+    background-color: rgba(180, 180, 180, 1);
+}
+
+#rect-left {
+    background-color: rgba(255, 255, 255, 0.8); 
+    border-radius: 10px;
+    padding: 10px;
+}
+
+#rect_right {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    padding: 10px;
+}

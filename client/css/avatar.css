@@ -1,0 +1,41 @@
+/* Для кнопок с аватарами */
+.avatar-button {
+    min-width: 150px;          /* Минимальная ширина кнопки увеличена */
+    min-height: 150px;         /* Минимальная высота кнопки увеличена */
+    border: none;              /* Без рамки */
+    border-radius: 50%;        /* Круглая форма */
+    background-size: cover;    /* Фон будет покрывать кнопку */
+    background-position: center; /* Центрирование фона */
+    background-repeat: no-repeat; /* Фон не повторяется */
+    margin: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Тень для кнопки */
+}
+
+.avatar-button:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Более сильная тень при наведении */
+}
+
+/* Применение изображений к кнопкам */
+#avatar-button-1 {
+    min-width: 80px;
+    min-height: 90px;
+    background-image: url('../img/bee1.png');
+}
+
+#avatar-button-2 {
+    min-width: 80px;
+    min-height: 90px;
+    background-image: url('../img/bee2.png');
+}
+
+#avatar-button-3 {
+    min-width: 80px;
+    min-height: 90px;
+    background-image: url('../img/bee3.png');
+}
+
+#avatar-button-4 {
+    min-width: 80px;
+    min-height: 90px;
+    background-image: url('../img/bee4.png');
+}
