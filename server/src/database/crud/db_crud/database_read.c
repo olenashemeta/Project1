@@ -19,7 +19,7 @@ t_list *database_read(const char* select, const char* from, const char* where) {
     char* error = NULL;
     char* command = NULL;
     t_list* res = NULL;
-    int rc = sqlite3_open(DB_NAME, &db);
+    int rc = sqlite3_open(exe_path, &db);
 
     validate_database_operation(rc, db, NULL);
 

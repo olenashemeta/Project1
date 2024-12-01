@@ -4,7 +4,7 @@ void users_migration_up(void) {
     sqlite3* db;
     char* error = NULL;
     char* command = NULL;
-    int rc = sqlite3_open(DB_NAME, &db);
+    int rc = sqlite3_open(exe_path, &db);
 
     validate_database_operation(rc, db, NULL);
 
@@ -26,7 +26,7 @@ void users_migration_down(void) {
     sqlite3* db;
     char* error = NULL;
     char* command = NULL;
-    int rc = sqlite3_open(DB_NAME, &db);
+    int rc = sqlite3_open(exe_path, &db);
 
     validate_database_operation(rc, db, NULL);
 

@@ -27,7 +27,7 @@ static void set_exe_path(void) {
         return;
     }
     char *dir = dirname(full_path);
-    snprintf(exe_path, PATH_MAX, "%s", dir);
+    snprintf(exe_path, PATH_MAX, "%s/%s", dir, DB_NAME);
 }
 
 int start_server(t_server *server, const char *port) {
@@ -109,7 +109,7 @@ int main(int argc, char **argv) {
     }
 
     set_exe_path();
-    printf("Executable path: %s\n", exe_path);
+    printf("Database file path: %s\n", exe_path);
     migration_up();
 
     const char *port = argv[1];
