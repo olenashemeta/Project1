@@ -50,6 +50,7 @@ typedef struct s_server {
 //models
 typedef struct s_user {
 	int id;
+	int logo_id;
 	char* username;
 	char* login;
 	char* password;
@@ -133,7 +134,7 @@ void db_user_remove_from_froup(int user_id, int group_id);
 void validate_database_operation(int rc, sqlite3* db, char* error);
 
 //Model functions
-t_user* user_create(const char* username, const char* login, const char* password);
+t_user* user_create(const char* username, const char* login, const char* password, int logo_id);
 t_user* user_from_data_list(t_list* list);
 t_list* user_list_from_data_list(t_list* list);
 void free_user(t_user** user);

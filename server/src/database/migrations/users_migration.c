@@ -14,6 +14,7 @@ void users_migration_up() {
         "username VARCHAR(255) NOT NULL,"
         "login VARCHAR(255) NOT NULL UNIQUE,"
         "password VARCHAR(255) NOT NULL,"
+        "logo_id INTEGER DEFAULT 1,"
         "created_at DATETIME NOT NULL)", 0, 0, &error);
     
     validate_database_operation(rc, db, error);
