@@ -2,7 +2,6 @@
 
 char exe_path[PATH_MAX];
 
-/*
 static void set_exe_path(void) {
     char full_path[PATH_MAX];
 
@@ -15,20 +14,19 @@ static void set_exe_path(void) {
     full_path[len] = '\0';
     char *dir = dirname(full_path);
 
-    snprintf(exe_path, PATH_MAX, "%s", dir);
-}
-*/
-
-static void set_exe_path(void) {
-    char full_path[PATH_MAX];
-    uint32_t size = sizeof(full_path);
-    if (_NSGetExecutablePath(full_path, &size) != 0) {        
-	perror("Failed to get executable path");
-        return;
-    }
-    char *dir = dirname(full_path);
     snprintf(exe_path, PATH_MAX, "%s/%s", dir, DB_NAME);
 }
+
+// static void set_exe_path(void) {
+//     char full_path[PATH_MAX];
+//     uint32_t size = sizeof(full_path);
+//     if (_NSGetExecutablePath(full_path, &size) != 0) {        
+// 	perror("Failed to get executable path");
+//         return;
+//     }
+//     char *dir = dirname(full_path);
+//     snprintf(exe_path, PATH_MAX, "%s/%s", dir, DB_NAME);
+// }
 
 int start_server(t_server *server, const char *port) {
 

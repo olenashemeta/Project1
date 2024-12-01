@@ -25,7 +25,7 @@
 #include <openssl/evp.h>
 #include <libgen.h>
 
-char exe_path[PATH_MAX];
+extern char exe_path[PATH_MAX];
 
 typedef struct s_keys {
 	EVP_PKEY *pkey;
