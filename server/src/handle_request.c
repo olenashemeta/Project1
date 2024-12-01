@@ -20,13 +20,10 @@ void handle_login_request(cJSON *json_payload) {
     }
     const char *password = password_item->valuestring;
 
-<<<<<<< HEAD
-    t_user * user = user_create(userlogin, userlogin, password);
+    t_user * user = user_create(userlogin, userlogin, password, 1);
     db_user_create(user);
     free_user(&user);
 
-=======
->>>>>>> origin
     syslog(LOG_INFO, "Login request received. Userlogin: %s, Userpassword: %s", userlogin, password);
     
 }
