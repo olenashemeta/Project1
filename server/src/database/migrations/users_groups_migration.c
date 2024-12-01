@@ -1,9 +1,9 @@
 #include "../../../inc/server.h"
 
-void users_groups_migration_up() {
+void users_groups_migration_up(void) {
     sqlite3* db;
     char* error = NULL;
-    int rc = sqlite3_open(DB_NAME, &db);
+    int rc = sqlite3_open(exe_path, &db);
 
     validate_database_operation(rc, db, NULL);
 
@@ -22,10 +22,10 @@ void users_groups_migration_up() {
     sqlite3_close(db);
 }
 
-void users_groups_migration_down() {
+void users_groups_migration_down(void) {
     sqlite3* db;
     char* error = NULL;
-    int rc = sqlite3_open(DB_NAME, &db);
+    int rc = sqlite3_open(exe_path, &db);
 
     validate_database_operation(rc, db, NULL);
 

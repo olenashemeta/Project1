@@ -2,7 +2,7 @@
 
 t_user *user_from_data_list(t_list *list)
 {
-	if (mx_list_size(list) < 5)return NULL;
+	if (mx_list_size(list) < 6)return NULL;
 
 	t_user* ret = (t_user*)malloc(sizeof(t_user));
 
@@ -18,12 +18,15 @@ t_user *user_from_data_list(t_list *list)
 	ret->password = (char*)list->data;
 
 	list = list->next;
+	ret->logo_id= mx_atoi((char*)list->data);
+
+	list = list->next;
 	ret->created_at = (char*)list->data;
 
 	return ret;
 }
 
-t_user* user_create(const char* username, const char* login, const char* password) 
+t_user* user_create(const char* username, const char* login, const char* password, int logo_id) 
 {
 	t_user* ret = (t_user*)malloc(sizeof(t_user));
 
@@ -35,6 +38,8 @@ t_user* user_create(const char* username, const char* login, const char* passwor
 
 	ret->password = mx_strdup(password);
 
+	ret->logo_id = logo_id;
+
 	ret->created_at = NULL;
 
 	return ret;
@@ -42,7 +47,7 @@ t_user* user_create(const char* username, const char* login, const char* passwor
 
 t_list *user_list_from_data_list(t_list* list) 
 {
-	int size = mx_list_size(list) / 5;
+	int size = mx_list_size(list) / 6;
 	if (size < 1) return NULL;
 	t_list* ret = NULL;
 
@@ -60,6 +65,9 @@ t_list *user_list_from_data_list(t_list* list)
 
 		list = list->next;
 		u->password = (char*)list->data;
+
+		list = list->next;
+		u->logo_id = mx_atoi((char*)list->data);
 
 		list = list->next;
 		u->created_at = (char*)list->data;

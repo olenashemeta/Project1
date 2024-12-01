@@ -3,9 +3,9 @@
 int db_group_create(t_group* group)
 {
 	char* values = NULL;
-	asprintf(&values, "'%s', %d, datetime()", group->name, group->created_by);
+	asprintf(&values, "'%s', %d, %d, datetime()", group->name, group->is_private, group->created_by);
 
-	int ret = database_create("name, created_by, created_at", "groups", values);
+	int ret = database_create("name, is_private, created_by, created_at", "groups", values);
 
 	mx_strdel(&values);
 
@@ -58,7 +58,7 @@ t_group* db_group_read_by_id(int id) {
 	char* where = NULL;
 	asprintf(&where, "groups.id = %d GROUP BY groups.id ORDER BY last_message DESC", id);
 
-	t_list* list = database_read("groups.id, groups.name, groups.created_by, users.username, groups.created_at, max(messages.created_at) as last_message", "groups INNER JOIN users ON groups.created_by = users.id INNER JOIN messages ON groups.id = group_id", where);
+	t_list* list = database_read("groups.id, groups.name, groups.is_private, groups.created_by, users.username, groups.created_at, max(messages.created_at) as last_message", "groups INNER JOIN users ON groups.created_by = users.id INNER JOIN messages ON groups.id = group_id", where);
 	t_group* ret = group_from_data_list(list);
 
 	mx_del_list(list, mx_list_size(list));
@@ -68,9 +68,9 @@ t_group* db_group_read_by_id(int id) {
 	return ret;
 }
 
-t_list* db_group_read_all() {
+t_list* db_group_read_all(void) {
 
-	t_list* list = database_read("groups.id, groups.name, groups.created_by, users.username, groups.created_at, max(messages.created_at) as last_message", "groups INNER JOIN users ON groups.created_by = users.id INNER JOIN messages ON groups.id = group_id GROUP BY groups.id ORDER BY last_message DESC", NULL);
+	t_list* list = database_read("groups.id, groups.name, groups.is_private, groups.created_by, users.username, groups.created_at, max(messages.created_at) as last_message", "groups INNER JOIN users ON groups.created_by = users.id INNER JOIN messages ON groups.id = group_id GROUP BY groups.id ORDER BY last_message DESC", NULL);
 	t_list* ret = group_list_from_data_list(list);
 
 	mx_del_list(list, mx_list_size(list));

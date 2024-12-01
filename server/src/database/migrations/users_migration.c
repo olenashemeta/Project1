@@ -1,10 +1,10 @@
 #include "../../../inc/server.h"
 
-void users_migration_up() {
+void users_migration_up(void) {
     sqlite3* db;
     char* error = NULL;
     char* command = NULL;
-    int rc = sqlite3_open(DB_NAME, &db);
+    int rc = sqlite3_open(exe_path, &db);
 
     validate_database_operation(rc, db, NULL);
 
@@ -14,6 +14,7 @@ void users_migration_up() {
         "username VARCHAR(255) NOT NULL,"
         "login VARCHAR(255) NOT NULL UNIQUE,"
         "password VARCHAR(255) NOT NULL,"
+        "logo_id INTEGER DEFAULT 1,"
         "created_at DATETIME NOT NULL)", 0, 0, &error);
     
     validate_database_operation(rc, db, error);
@@ -21,11 +22,11 @@ void users_migration_up() {
     sqlite3_close(db);
 }
 
-void users_migration_down() {
+void users_migration_down(void) {
     sqlite3* db;
     char* error = NULL;
     char* command = NULL;
-    int rc = sqlite3_open(DB_NAME, &db);
+    int rc = sqlite3_open(exe_path, &db);
 
     validate_database_operation(rc, db, NULL);
 

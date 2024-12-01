@@ -25,6 +25,8 @@
 #include <openssl/evp.h>
 #include <libgen.h>
 
+extern char exe_path[PATH_MAX];
+
 typedef struct s_keys {
 	EVP_PKEY *pkey;
 	unsigned char aes_key[AES_KEY_SIZE];
@@ -52,6 +54,7 @@ typedef struct s_server {
 //models
 typedef struct s_user {
 	int id;
+	int logo_id;
 	char* username;
 	char* login;
 	char* password;
@@ -70,6 +73,7 @@ typedef struct s_message {
 typedef struct s_group {
 	int id;
 	char* name;
+	int is_private;
 	int created_by;
 	char* creator_username;
 	char* created_at;
@@ -77,16 +81,16 @@ typedef struct s_group {
 } t_group;
 
 //Migrations
-void users_migration_up();
-void users_migration_down();
-void groups_migration_up();
-void groups_migration_down();
-void messages_migration_up();
-void messages_migration_down();
-void users_groups_migration_up();
-void users_groups_migration_down();
-void migration_up();
-void migration_down();
+void users_migration_up(void);
+void users_migration_down(void);
+void groups_migration_up(void);
+void groups_migration_down(void);
+void messages_migration_up(void);
+void messages_migration_down(void);
+void users_groups_migration_up(void);
+void users_groups_migration_down(void);
+void migration_up(void);
+void migration_down(void);
 
 //CRUD Operations
 int database_create(const char* insert, const char* into, const char* values);
@@ -102,7 +106,7 @@ void db_user_delete_by_named_field(const char* field, const char* value);
 void db_user_update(t_user* user);
 t_user* db_user_read_by_id(int id);
 t_user* db_user_read_by_login(const char *login);
-t_list* db_user_read_all();
+t_list* db_user_read_all(void);
 
 //Messages CRUD
 int db_message_create(t_message* message);
@@ -111,7 +115,7 @@ void db_message_delete_by_id(int id);
 void db_message_delete_by_named_field(const char* field, const char* value);
 void db_message_update(t_message* message);
 t_message* db_message_read_by_id(int id);
-t_list* db_message_read_all();
+t_list* db_message_read_all(void);
 t_list* db_message_read_by_sender_id(int id);
 t_list* db_message_read_by_group_id(int id);
 
@@ -122,7 +126,7 @@ void db_group_delete_by_id(int id);
 void db_group_delete_by_named_field(const char* field, const char* value);
 void db_group_update(t_group* group);
 t_group* db_group_read_by_id(int id);
-t_list* db_group_read_all();
+t_list* db_group_read_all(void);
 
 //Users-Groups CRUD
 t_list* db_user_read_by_group_id(int id);
@@ -134,7 +138,7 @@ void db_user_remove_from_froup(int user_id, int group_id);
 void validate_database_operation(int rc, sqlite3* db, char* error);
 
 //Model functions
-t_user* user_create(const char* username, const char* login, const char* password);
+t_user* user_create(const char* username, const char* login, const char* password, int logo_id);
 t_user* user_from_data_list(t_list* list);
 t_list* user_list_from_data_list(t_list* list);
 void free_user(t_user** user);
@@ -147,7 +151,7 @@ void free_message(t_message** message);
 void free_message_list(t_list* list);
 
 t_group* group_from_data_list(t_list* list);
-t_group* group_create(const char* name, int created_by);
+t_group* group_create(const char* name, int created_by, int is_private);
 t_list* group_list_from_data_list(t_list* list);
 void free_group(t_group** group);
 void free_group_list(t_list* list);

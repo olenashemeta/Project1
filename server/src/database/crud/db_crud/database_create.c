@@ -4,7 +4,7 @@ int database_create(const char* insert, const char* into, const char* values) {
     sqlite3* db;
     char* error = NULL;
     char* command = NULL;
-    int rc = sqlite3_open(DB_NAME, &db);
+    int rc = sqlite3_open(exe_path, &db);
 
     validate_database_operation(rc, db, NULL);
 

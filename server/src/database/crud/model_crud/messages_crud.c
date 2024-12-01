@@ -69,7 +69,7 @@ t_message* db_message_read_by_id(int id)
 	return ret;
 }
 
-t_list* db_message_read_all() 
+t_list* db_message_read_all(void) 
 {
 
 	t_list* list = database_read("messages.id, sent_by, users.username, text, group_id, messages.created_at", "messages INNER JOIN users ON sent_by = users.id", NULL);
