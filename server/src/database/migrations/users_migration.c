@@ -1,6 +1,6 @@
 #include "../../../inc/server.h"
 
-void users_migration_up() {
+void users_migration_up(void) {
     sqlite3* db;
     char* error = NULL;
     char* command = NULL;
@@ -22,7 +22,7 @@ void users_migration_up() {
     sqlite3_close(db);
 }
 
-void users_migration_down() {
+void users_migration_down(void) {
     sqlite3* db;
     char* error = NULL;
     char* command = NULL;

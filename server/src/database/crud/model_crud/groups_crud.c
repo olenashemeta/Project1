@@ -68,7 +68,7 @@ t_group* db_group_read_by_id(int id) {
 	return ret;
 }
 
-t_list* db_group_read_all() {
+t_list* db_group_read_all(void) {
 
 	t_list* list = database_read("groups.id, groups.name, groups.is_private, groups.created_by, users.username, groups.created_at, max(messages.created_at) as last_message", "groups INNER JOIN users ON groups.created_by = users.id INNER JOIN messages ON groups.id = group_id GROUP BY groups.id ORDER BY last_message DESC", NULL);
 	t_list* ret = group_list_from_data_list(list);

@@ -83,7 +83,7 @@ t_user* db_user_read_by_login(const char *login) {
 	return ret;
 }
 
-t_list* db_user_read_all() {
+t_list* db_user_read_all(void) {
 
 	t_list* list = database_read("id, username, login, password, logo_id, created_at", "users", NULL);
 	t_list* ret = user_list_from_data_list(list);

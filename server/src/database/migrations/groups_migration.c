@@ -1,6 +1,6 @@
 #include "../../../inc/server.h"
 
-void groups_migration_up() {
+void groups_migration_up(void) {
     sqlite3* db;
     char* error = NULL;
     int rc = sqlite3_open(DB_NAME, &db);
@@ -22,7 +22,7 @@ void groups_migration_up() {
     sqlite3_close(db);
 }
 
-void groups_migration_down() {
+void groups_migration_down(void) {
     sqlite3* db;
     char* error = NULL;
     int rc = sqlite3_open(DB_NAME, &db);

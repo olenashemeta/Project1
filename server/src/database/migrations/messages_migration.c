@@ -1,6 +1,6 @@
 #include "../../../inc/server.h"
 
-void messages_migration_up() {
+void messages_migration_up(void) {
     sqlite3* db;
     char* error = NULL;
     char* command = NULL;
@@ -23,7 +23,7 @@ void messages_migration_up() {
     sqlite3_close(db);
 }
 
-void messages_migration_down() {
+void messages_migration_down(void) {
     sqlite3* db;
     char* error = NULL;
     char* command = NULL;
