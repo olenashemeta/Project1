@@ -1,12 +1,12 @@
 #include "../inc/server.h"
-
-void process_request(t_receive *receive_data) {
+//добавлен атрибут так как пока что структура t_client не используеться в этой функции
+void process_request(t_packet *receive_data, t_client *client __attribute__((unused))) {
     if (!receive_data || !receive_data->data) {
         syslog(LOG_ERR, "Invalid t_receive structure in process_request");
         return;
     }
 
-    cJSON *json_payload = cJSON_Parse(receive_data->data);
+    cJSON *json_payload = cJSON_ParseWithLength(receive_data->data, receive_data->len);
     if (!json_payload) {
         syslog(LOG_ERR, "Failed to parse JSON from received data: %s", receive_data->data);
         return;

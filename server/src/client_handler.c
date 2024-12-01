@@ -12,18 +12,17 @@ void *handle_client(void *arg) {
         pthread_exit(NULL);
     }
 
-    t_receive *received_data = NULL;
+    t_packet *received_data = NULL;
 
-    while ((received_data = receive_request(client->socket_fd)) != NULL) {
+    while ((received_data = receive_packet(client->socket_fd)) != NULL) {
         if (decrypt_received_data(received_data, client->keys.aes_key, client->keys.aes_iv) == -1) {
             syslog(LOG_ERR, "Failed to decrypt data from client ID: %ld", client->thread_id);
-            free_receive(received_data);
+            free_packet(received_data);
             break;
         }
 
-        process_request(received_data);
-
-        free_receive(received_data);
+        process_request(received_data, client);
+        free_packet(received_data);
     }
 
     syslog(LOG_INFO, "Client ID: %ld disconnected", client->thread_id);

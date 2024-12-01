@@ -28,10 +28,10 @@ typedef struct s_keys {
 	unsigned char aes_iv[AES_IV_SIZE];
 }				t_keys;
 
-typedef struct s_request {
+typedef struct s_packet {
 	size_t len;
 	char *data;
-}			   t_request;
+}			   t_packet;
 
 typedef struct s_main {
 	int socket;
@@ -40,10 +40,10 @@ typedef struct s_main {
 	int port;
 	bool is_connected;
 	bool is_closing;
-	cJSON *server_response;
+	//cJSON *server_response;
 	pthread_mutex_t lock;
 	pthread_cond_t cond;
-	bool has_new_data;
+	//bool has_new_data;
 	t_keys keys;
 
 }				t_main;
@@ -58,6 +58,7 @@ int mx_connect_to_server(t_main *main);
 int mx_receiving_pubkey(t_main *main);
 int mx_transfer_aes_key(t_main *main);
 int handshake(t_main *main);
+void process_response(t_packet *recieved_data);
 
 //security func
 int generate_aes_key_iv(t_main *main);
@@ -66,8 +67,7 @@ unsigned char *encrypt_json_with_aes(const unsigned char *aes_key, const unsigne
                                      cJSON *json, size_t *out_len);
 int encrypt_aes_key(EVP_PKEY *pubkey, const unsigned char *aes_key, unsigned char *encrypted_key);
 
-int aes_decrypt(const unsigned char *ciphertext, int ciphertext_len, const unsigned char *key, const unsigned char *iv, unsigned char *plaintext);
-int aes_encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key, unsigned char *iv, unsigned char *ciphertext);
+int decrypt_received_data(t_packet *data, const unsigned char *aes_key, const unsigned char *iv);
 
 //UI func
 void login_window(GtkApplication *app, gpointer user_data);
@@ -79,16 +79,21 @@ void mx_free_main_data(t_main *main);
 //func json request
 cJSON *form_login_request(const char *login, const char *password);
 cJSON *form_aes_key_transfer(const unsigned char *aes_key, const unsigned char *iv, EVP_PKEY *pubkey);
-void prepare_and_send_json(cJSON *json_payload, t_main *main);
-void send_request(t_request *reg, int socket);
+
 
 //Base64
 char *base64_encode(const unsigned char *input, size_t input_len);
 unsigned char *base64_decode(const char *input, size_t *output_len);
 
 //request utils func
-t_request *create_request(const char *data, size_t data_len);
-void free_request(t_request *req);
+t_packet *create_message(const char *data, size_t data_len);
+void free_message(t_packet *req);
+void prepare_and_send_json(cJSON *json_payload, t_main *main);
+void send_message(t_packet *reg, int socket);
+
+//receiving a response from the server
+t_packet *receive_message(int socket_fd);
+t_packet *create_receive(int len, const char *data);
 
 //test func
 t_user *mx_create_client(void);

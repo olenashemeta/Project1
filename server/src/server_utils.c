@@ -29,4 +29,4 @@ void free_server(t_server *server) {
 
     free(server);
 }
-    
+

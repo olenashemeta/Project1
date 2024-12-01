@@ -18,8 +18,8 @@ t_main *mx_create_main_data(const char *address, int port) {
     main->port = port;
     main->rec_delay = 5;
 
-    main->server_response = NULL;
-    main->has_new_data = false;
+    //main->server_response = NULL;
+    //main->has_new_data = false;
 
     main->keys.pkey = NULL;
 
@@ -36,7 +36,7 @@ void mx_free_main_data(t_main *main) {
     if (!main) return;
 
     if (main->address) free(main->address);
-    if (main->server_response) cJSON_Delete(main->server_response);
+    //if (main->server_response) cJSON_Delete(main->server_response);
 
     if (main->keys.pkey) {
         EVP_PKEY_free(main->keys.pkey);

@@ -60,67 +60,6 @@ int handshake(t_main *main) {
     return 0;
 }
 
-int aes_encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
-                unsigned char *iv, unsigned char *ciphertext) {
-    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-    if (!ctx) return -1;
-
-    int len, ciphertext_len;
-
-    if (1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv)) {
-        EVP_CIPHER_CTX_free(ctx);
-        return -1;
-    }
-
-    if (1 != EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len)) {
-        EVP_CIPHER_CTX_free(ctx);
-        return -1;
-    }
-    ciphertext_len = len;
-
-    if (1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len)) {
-        EVP_CIPHER_CTX_free(ctx);
-        return -1;
-    }
-    ciphertext_len += len;
-
-    EVP_CIPHER_CTX_free(ctx);
-    return ciphertext_len;
-}
-
-int aes_decrypt(const unsigned char *ciphertext, int ciphertext_len, const unsigned char *key, const unsigned char *iv, unsigned char *plaintext) {
-    EVP_CIPHER_CTX *ctx;
-    int len;
-    int plaintext_len;
-
-    if (!(ctx = EVP_CIPHER_CTX_new())) {
-        fprintf(stderr, "Error initializing decryption context\n");
-        return -1;
-    }
-
-    if (EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv) != 1) {
-        fprintf(stderr, "Error setting decryption parameters\n");
-        EVP_CIPHER_CTX_free(ctx);
-        return -1;
-    }
-
-    if (EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len) != 1) {
-        fprintf(stderr, "Error during decryption\n");
-        EVP_CIPHER_CTX_free(ctx);
-        return -1;
-    }
-    plaintext_len = len;
-
-    if (EVP_DecryptFinal_ex(ctx, plaintext + len, &len) != 1) {
-        fprintf(stderr, "Error finalizing decryption\n");
-        EVP_CIPHER_CTX_free(ctx);
-        return -1;
-    }
-    plaintext_len += len;
-
-    EVP_CIPHER_CTX_free(ctx);
-    return plaintext_len;
-}
 
 int encrypt_aes_key(EVP_PKEY *pubkey, const unsigned char *aes_key, unsigned char *encrypted_key) {
     if (!pubkey || !aes_key || !encrypted_key) {
@@ -190,7 +129,7 @@ int mx_receiving_pubkey(t_main *main) {
 }
 
 int mx_transfer_aes_key(t_main *main) {
-    if (!main || !main->keys.aes_key || !main->keys.aes_iv || !main->keys.pkey) {
+    if (!main || !main->keys.pkey || main->keys.aes_key[0] == '\0' || main->keys.aes_iv[0] == '\0') {
         fprintf(stderr, "Invalid input: missing AES keys or public key\n");
         return -1;
     }
@@ -229,73 +168,6 @@ int mx_transfer_aes_key(t_main *main) {
     cJSON_Delete(json_transfer_key);
     return 0;
 }
-
-/*
-unsigned char *encrypt_json_with_aes(const unsigned char *aes_key, const unsigned char *iv, cJSON *json, size_t *out_len) {
-    if (!aes_key || !iv || !json || !out_len) {
-        fprintf(stderr, "Invalid argument(s) to encrypt_json_with_aes\n");
-        return NULL;
-    }
-
-    char *json_string = cJSON_PrintUnformatted(json);
-    if (!json_string) {
-        fprintf(stderr, "Failed to convert JSON to string\n");
-        return NULL;
-    }
-    
-    printf("JSON string to encrypt: %s\n", json_string);
-
-    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-    if (!ctx) {
-        fprintf(stderr, "Failed to create EVP_CIPHER_CTX\n");
-        free(json_string);
-        return NULL;
-    }
-
-    if (EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, aes_key, iv) != 1) {
-        fprintf(stderr, "EVP_EncryptInit_ex failed\n");
-        EVP_CIPHER_CTX_free(ctx);
-        free(json_string);
-        return NULL;
-    }
-
-    size_t json_len = strlen(json_string);
-    size_t encrypted_data_len = json_len + AES_KEY_SIZE;
-    unsigned char *encrypted_data = (unsigned char *)malloc(encrypted_data_len);
-    if (!encrypted_data) {
-        fprintf(stderr, "Failed to allocate memory for encrypted data\n");
-        EVP_CIPHER_CTX_free(ctx);
-        free(json_string);
-        return NULL;
-    }
-
-    int len = 0;
-    int total_len = 0;
-    if (EVP_EncryptUpdate(ctx, encrypted_data, &len, (unsigned char *)json_string, json_len) != 1) {
-        fprintf(stderr, "EVP_EncryptUpdate failed\n");
-        EVP_CIPHER_CTX_free(ctx);
-        free(json_string);
-        free(encrypted_data);
-        return NULL;
-    }
-    total_len = len;
-
-    if (EVP_EncryptFinal_ex(ctx, encrypted_data + len, &len) != 1) {
-        fprintf(stderr, "EVP_EncryptFinal_ex failed\n");
-        EVP_CIPHER_CTX_free(ctx);
-        free(json_string);
-        free(encrypted_data);
-        return NULL;
-    }
-    total_len += len;
-
-    EVP_CIPHER_CTX_free(ctx);
-    free(json_string);
-
-    *out_len = total_len;
-    return encrypted_data;
-}
-*/
 
 unsigned char *encrypt_json_with_aes(const unsigned char *aes_key, const unsigned char *iv, 
                                      cJSON *json, size_t *out_len) {
@@ -363,4 +235,69 @@ unsigned char *encrypt_json_with_aes(const unsigned char *aes_key, const unsigne
 
     return encrypted_data;
 }
+
+int decrypt_received_data(t_packet *data, const unsigned char *aes_key, const unsigned char *iv) {
+    if (!data || !aes_key || !iv) {
+        fprintf(stderr, "Invalid argument(s) to decrypt_received_data\n");
+        return -1;
+    }
+
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+    if (!ctx) {
+        fprintf(stderr, "Failed to create EVP_CIPHER_CTX\n");
+        return -1;
+    }
+
+    if (EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, aes_key, iv) != 1) {
+        fprintf(stderr, "EVP_DecryptInit_ex failed\n");
+        EVP_CIPHER_CTX_free(ctx);
+        return -1;
+    }
+
+    size_t block_size = EVP_CIPHER_block_size(EVP_aes_256_cbc());
+    size_t decrypted_data_len = data->len + block_size;
+    unsigned char *decrypted_data = (unsigned char *)malloc(decrypted_data_len);
+    if (!decrypted_data) {
+        fprintf(stderr, "Failed to allocate memory for decrypted data\n");
+        EVP_CIPHER_CTX_free(ctx);
+        return -1;
+    }
+
+    int bytes_written = 0, final_bytes_written = 0;
+    if (EVP_DecryptUpdate(ctx, decrypted_data, &bytes_written, (unsigned char *)data->data, data->len) != 1) {
+        fprintf(stderr, "EVP_DecryptUpdate failed\n");
+        EVP_CIPHER_CTX_free(ctx);
+        free(decrypted_data);
+        return -1;
+    }
+
+    if (EVP_DecryptFinal_ex(ctx, decrypted_data + bytes_written, &final_bytes_written) != 1) {
+        fprintf(stderr, "EVP_DecryptFinal_ex failed\n");
+        EVP_CIPHER_CTX_free(ctx);
+        free(decrypted_data);
+        return -1;
+    }
+
+    EVP_CIPHER_CTX_free(ctx);
+
+    size_t total_decrypted_len = bytes_written + final_bytes_written;
+
+    free(data->data);
+    data->data = (char *)malloc(total_decrypted_len + 1); 
+    if (!data->data) {
+        fprintf(stderr, "Failed to allocate memory for decrypted data in structure\n");
+        free(decrypted_data);
+        return -1;
+    }
+
+    memcpy(data->data, decrypted_data, total_decrypted_len);
+    data->data[total_decrypted_len] = '\0';
+    data->len = total_decrypted_len;
+
+    free(decrypted_data);
+    fprintf(stderr, "Data successfully decrypted and updated in the structure\n");
+
+    return 0;
+}
+
 
