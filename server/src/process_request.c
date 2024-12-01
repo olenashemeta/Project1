@@ -1,6 +1,6 @@
 #include "../inc/server.h"
-
-void process_request(t_packet *receive_data, t_client *client) {
+//добавлен атрибут так как пока что структура t_client не используеться в этой функции
+void process_request(t_packet *receive_data, t_client *client __attribute__((unused))) {
     if (!receive_data || !receive_data->data) {
         syslog(LOG_ERR, "Invalid t_receive structure in process_request");
         return;

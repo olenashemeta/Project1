@@ -1,8 +1,8 @@
-CC = gcc
-CFLAGS = -Wall -I../libs/libmx/ -I../libs/Sqlite3Lib/ -I./src -I./src/database -I./src/database/crud/db_crud -I./src/database/crud/model_crud -I./src/database/migrations -I./src/model_functions
+CC = clang
+CFLAGS = -std=c11 -Wall -Wextra -Wpedantic -I../libs/libmx/ -I../libs/Sqlite3Lib/ -I./src -I./src/database -I./src/database/crud/db_crud -I./src/database/crud/model_crud -I./src/database/migrations -I./src/model_functions -D_GNU_SOURCE
 SRC_DIR = src
 OBJ_DIR = obj
-NAME = server
+NAME = uchat_server
 
 LIB_DIR = ../libs/JsonLib
 LIB_MX_DIR = ../libs/libmx
@@ -19,10 +19,6 @@ SRC_DIRS = $(SRC_DIR) $(SRC_DIR)/database $(SRC_DIR)/database/crud/db_crud $(SRC
 
 SRCS = $(wildcard $(foreach dir, $(SRC_DIRS), $(dir)/*.c))
 OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
-
-KEY_DIR = .
-PRIVATE_KEY = $(KEY_DIR)/private_key.pem
-PUBLIC_KEY = $(KEY_DIR)/public_key.pem
 
 all: $(NAME)
 

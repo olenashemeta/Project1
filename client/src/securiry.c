@@ -129,7 +129,7 @@ int mx_receiving_pubkey(t_main *main) {
 }
 
 int mx_transfer_aes_key(t_main *main) {
-    if (!main || !main->keys.aes_key || !main->keys.aes_iv || !main->keys.pkey) {
+    if (!main || !main->keys.pkey || main->keys.aes_key[0] == '\0' || main->keys.aes_iv[0] == '\0') {
         fprintf(stderr, "Invalid input: missing AES keys or public key\n");
         return -1;
     }
