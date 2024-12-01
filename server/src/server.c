@@ -1,5 +1,22 @@
 #include "../inc/server.h"
 
+char exe_path[PATH_MAX];
+
+static void set_exe_path(void) {
+    char full_path[PATH_MAX];
+
+    ssize_t len = readlink("/proc/self/exe", full_path, sizeof(full_path) - 1);
+    if (len == -1) {
+        perror("Failed to get executable path");
+        return;
+    }
+
+    full_path[len] = '\0';
+    char *dir = dirname(full_path);
+
+    snprintf(exe_path, PATH_MAX, "%s", dir);
+}
+
 int start_server(t_server *server, const char *port) {
 
     struct addrinfo network_config;
@@ -78,6 +95,8 @@ int main(int argc, char **argv) {
         return -1;
     }
 
+    set_exe_path();
+    printf("Executable path: %s\n", exe_path);
     migration_up();
 
     const char *port = argv[1];

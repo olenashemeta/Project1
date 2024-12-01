@@ -23,6 +23,7 @@
 #include <openssl/err.h>
 #include <openssl/pem.h>
 #include <openssl/evp.h>
+#include <libgen.h>
 
 typedef struct s_keys {
 	EVP_PKEY *pkey;
