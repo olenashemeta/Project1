@@ -63,14 +63,14 @@ void send_message(t_packet *req, int socket) {
 
 void prepare_and_send_json(cJSON *json_payload, t_client *client) {
     if (!client || !json_payload) {
-        fprintf(stderr, "Invalid arguments to prepare_and_send_json\n");
+        syslog(LOG_ERR, "Invalid arguments to prepare_and_send_json");
         return;
     }
 
     size_t encrypted_data_len;
     unsigned char *encrypted_data = encrypt_json_with_aes(client->keys.aes_key, client->keys.aes_iv, json_payload, &encrypted_data_len);
     if (!encrypted_data) {
-        fprintf(stderr, "Failed to encrypt JSON object\n");
+        syslog(LOG_ERR, "Failed to encrypt JSON object");
         cJSON_Delete(json_payload);
         return;
     }

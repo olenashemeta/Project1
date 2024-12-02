@@ -1,5 +1,7 @@
 #include "../inc/client.h"
 
+t_main *main_data;
+
 static void *connection(void *arg) {
     t_main *main = (t_main *)arg;
 
@@ -34,13 +36,6 @@ static void *connection(void *arg) {
             process_response(received_data);
 
             free_message(received_data);
-
-            // pthread_mutex_lock(&main->lock);
-            // cJSON_Delete(main->server_response);
-            // main->server_response = json_response;
-            // main->has_new_data = true;
-            // pthread_cond_signal(&main->cond);
-            // pthread_mutex_unlock(&main->lock);
         }
 
         close(main->socket);
@@ -51,28 +46,62 @@ static void *connection(void *arg) {
     pthread_exit(NULL);
 }
 
+static int handle_command_line(GApplication *app, GApplicationCommandLine *command_line, gpointer user_data) {
+    (void)user_data;
+
+    int argc;
+    char **argv = g_application_command_line_get_arguments(command_line, &argc);
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s [IP address] [Port]\n", argv[0]);
+        g_strfreev(argv);
+        return 1;
+    }
+
+    const char *ip = argv[1];
+    const char *port_str = argv[2];
+    int port = atoi(port_str);
+
+    main_data = mx_create_main_data(ip, port);
+    if (!main_data) {
+        fprintf(stderr, "Failed to initialize main data\n");
+        g_strfreev(argv);
+        return 1;
+    }
+
+    g_strfreev(argv);
+    g_application_activate(app);
+    return 0;
+}
+
 static void activate(GtkApplication *app, gpointer user_data) {
-    t_main *main = (t_main*)user_data;
-    if (main) {
+    (void)user_data;
+
+    if (main_data) {
         pthread_t thread_id;
-        if ((pthread_create(&thread_id, NULL, connection, main)) != 0){
+        if ((pthread_create(&thread_id, NULL, connection, main_data)) != 0) {
+            fprintf(stderr, "Failed to create connection thread\n");
+            mx_free_main_data(main_data);
             return;
         }
-        login_window(app, user_data);
+        login_window(app, main_data);
     }
 }
 
 int main(int argc, char **argv) {
     GtkApplication *app;
     int status;
-    t_main *main = mx_create_main_data("127.0.0.1", 8080);
 
-    app = gtk_application_new("app.chat", 0);
-    g_signal_connect(app, "activate", G_CALLBACK (activate), main);
-    status = g_application_run (G_APPLICATION (app), argc, argv);
+    app = gtk_application_new("app.chat", G_APPLICATION_HANDLES_COMMAND_LINE);
+    g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
+    g_signal_connect(app, "command-line", G_CALLBACK(handle_command_line), NULL);
+
+    status = g_application_run(G_APPLICATION(app), argc, argv);
+
+    if (main_data) {
+        main_data->is_closing = true;
+        mx_free_main_data(main_data);
+    }
 
     g_object_unref(app);
-    mx_free_main_data(main);
     return status;
 }
-
