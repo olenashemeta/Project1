@@ -49,8 +49,9 @@ typedef struct s_main {
 }				t_main;
 
 typedef struct s_user {
-	char* login;
-	char* password;
+    char* login;
+    char* name;
+    char* password;
 } t_user;
 
 //func to communicate with the server
@@ -95,12 +96,25 @@ void send_message(t_packet *reg, int socket);
 t_packet *receive_message(int socket_fd);
 t_packet *create_receive(int len, const char *data);
 
+
+//UI LOGIN REGISTER PAGE FUNC
+
+void load_css(GtkWidget *window);
+void load_css_for_screen(const char *css_file_path);
+GtkWidget* create_image(const char *image_path, int width, int height);
+t_user* mx_create_user(const char* login, const char* name, const char* password);
+void mx_free_user(t_user* new_user);
+t_user* mx_create_log_user(const char* login, const char* password);
+//buttons
+void on_create_account_button_clicked(GtkWidget *button, gpointer data);
+void on_login_button_clicked(GtkWidget *button, gpointer data);
+void on_submit_account_button_clicked(GtkWidget *button, gpointer data);
+void restore_login_form(GtkWidget *button, gpointer data);
+
 //test func
 t_user *mx_create_client(void);
 void mx_print_client(const t_user *client);
 void mx_free_client(t_user *client);
 void test_base64_encoding(t_main *main_data);
 
-
 #endif
-

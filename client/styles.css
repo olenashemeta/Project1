@@ -1,0 +1,54 @@
+
+#main-window {
+    background-image: url('img/back_of_page.svg'); 
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;
+}
+
+#title-label{
+    color: white;          
+    font-weight: bold;    
+    font-size: 30px; 
+}
+
+#label-create-account{
+    color: white;          
+    font-weight: bold;    
+    font-size: 20px; 
+}
+
+#username_entry, #password_entry, #login_entry, #confirm_password_entry{
+    color: #3b2103; 
+    border: 2px solid black; 
+    border-radius: 15px;
+    padding: 10px 20px; 
+    font-size: 14px;
+}
+
+#create_account_button, #login_button, #submit_create_account_button,  #back_to_login_button{
+    background: #372d10;
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;
+    color: white; 
+    border: 2px solid black;
+    border-radius: 15px;
+    padding: 10px 20px; 
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#create_account_button:hover, #login_button:hover, #submit_create_account_button:hover,  #back_to_login_button:hover {
+    background-color: #534005;
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;    
+    box-shadow: 0 6px 8px rgba(14, 3, 78, 0.2); 
+}
+
+#error-label {
+    color: #961717;
+    font-weight: bold;    
+    font-size: 16px;             
+}

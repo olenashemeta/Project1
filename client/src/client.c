@@ -36,6 +36,13 @@ static void *connection(void *arg) {
             process_response(received_data);
 
             free_message(received_data);
+            
+            // pthread_mutex_lock(&main->lock);
+            // cJSON_Delete(main->server_response);
+            // main->server_response = json_response;
+            // main->has_new_data = true;
+            // pthread_cond_signal(&main->cond);
+            // pthread_mutex_unlock(&main->lock);
         }
 
         close(main->socket);
@@ -83,6 +90,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
             mx_free_main_data(main_data);
             return;
         }
+        load_css_for_screen("styles.css");
         login_window(app, main_data);
     }
 }
