@@ -98,8 +98,12 @@ static void activate(GtkApplication *app, gpointer user_data) {
 int main(int argc, char **argv) {
     GtkApplication *app;
     int status;
+    char app_id[64];
 
-    app = gtk_application_new("app.chat", G_APPLICATION_HANDLES_COMMAND_LINE);
+    snprintf(app_id, sizeof(app_id), "bee.chat%d", getpid());
+    printf("Starting application with ID: %s\n", app_id);
+
+    app = gtk_application_new(app_id, G_APPLICATION_HANDLES_COMMAND_LINE);
     g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
     g_signal_connect(app, "command-line", G_CALLBACK(handle_command_line), NULL);
 
