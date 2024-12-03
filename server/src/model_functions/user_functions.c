@@ -98,3 +98,30 @@ void free_user_list(t_list* list)
 	}
 	mx_del_list(list, size);
 }
+
+cJSON *user_to_json(t_user* user) {
+	if(!user) return NULL;
+	cJSON* json = cJSON_CreateObject();
+	
+	if(!json_payload || !user) return NULL;
+
+	cJSON_AddNumberToObject(json, "id", (const double)user->id);
+	cJSON_AddNumberToObject(json, "logo_id", (const double)user->logo_id);
+	cJSON_AddStringToObject(json, "username", user->username);
+	cJSON_AddStringToObject(json, "login", user->login);
+	cJSON_AddStringToObject(json, "password", user->password);
+	cJSON_AddStringToObject(json, "created_at", user->created_at);
+
+	return json;
+}
+
+cJSON* users_list_to_json_array(t_list* list) {
+	cJSON *array = cJSON_CreateArray();
+	if(!array) return NULL;
+	while(list) {
+		cJSON *item = user_to_json((t_user *)list->data);
+		if(!item)break;
+		cJSON_AddItemToArray(array, item);
+	}
+	return array;
+}

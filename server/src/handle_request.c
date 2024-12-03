@@ -1,6 +1,6 @@
 #include "../inc/server.h"
 
-void handle_login_request(cJSON *json_payload) {
+void handle_login_request(cJSON *json_payload, t_client *client) {
     if (!json_payload) {
         syslog(LOG_ERR, "Invalid JSON payload in handle_login_request");
         return;
@@ -19,9 +19,23 @@ void handle_login_request(cJSON *json_payload) {
         return;
     }
     const char *password = password_item->valuestring;
+    
+     cJSON *json = cJSON_CreateObject();
+     cJSON_AddStringToObject(json, "response_type", "login");
 
-    t_user * user = user_create(userlogin, userlogin, password, 1);
-    db_user_create(user);
+    t_user * user = db_user_read_by_login();
+    
+    cJSON *json_user = user_to_json(user);
+    if(!json_user) {
+         cJSON_AddBoolToObject(json, "status", false);
+         cJSON_AddStringToObject(json, "data", "User could not be found");
+    }
+    else {
+        cJSON_AddBoolToObject(json, "status", true);
+        cJSON_AddItemToObject(json, "data", json_user);
+    }
+
+    prepare_and_send_json(json, client);
     free_user(&user);
 
     syslog(LOG_INFO, "Login request received. Userlogin: %s, Userpassword: %s", userlogin, password);

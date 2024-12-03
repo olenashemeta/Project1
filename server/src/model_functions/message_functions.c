@@ -98,3 +98,30 @@ void free_message_list(t_list* list)
 	}
 	mx_del_list(list, size);
 }
+
+cJSON *message_to_json(t_message* msg) {
+	if(!msg) return NULL;
+	cJSON* json = cJSON_CreateObject();
+	
+	if(!json_payload) return NULL;
+
+	cJSON_AddNumberToObject(json, "id", (const double)msg->id);
+	cJSON_AddNumberToObject(json, "sent_by", (const double)msg->sent_by);
+	cJSON_AddStringToObject(json, "sender_username", msg->sender_username);
+	cJSON_AddStringToObject(json, text", msg->text);
+	cJSON_AddNumberToObject(json, "group_id", (const double)msg->group_id);
+	cJSON_AddStringToObject(json, "created_at", msg->created_at);
+
+	return json;
+}
+
+cJSON *messages_list_to_json_array(t_list* list) {
+	cJSON *array = cJSON_CreateArray();
+	if(!array) return NULL;
+	while(list) {
+		cJSON *item = meesage_to_json((t_message *)list->data);
+		if(!item)break;
+		cJSON_AddItemToArray(array, item);
+	}
+	return array;
+}

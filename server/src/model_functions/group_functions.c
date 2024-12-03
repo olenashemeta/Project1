@@ -107,3 +107,31 @@ void free_group_list(t_list* list)
 	}
 	mx_del_list(list, size);
 }
+
+cJSON *group_to_json(t_group* group) {
+	if(!group) return NULL;
+	cJSON* json = cJSON_CreateObject();
+	
+	if(!json_payload) return NULL;
+
+	cJSON_AddNumberToObject(json, "id", (const double)group->id);
+	cJSON_AddStringToObject(json, "name", group->name);
+	cJSON_AddBoolToObject(json, "is_private", group->is_private == 1);
+	cJSON_AddNumberToObject(json, "created_by", (const double)group->created_by);
+	cJSON_AddStringToObject(json, "creator_username", group->creator_username);
+	cJSON_AddStringToObject(json, "created_at", user->created_at);
+	cJSON_AddStringToObject(json, "last_message_date", group->last_message_date);
+
+	return json;
+}
+
+cJSON *groups_list_to_json_array(t_list* list) {
+	cJSON *array = cJSON_CreateArray();
+	if(!array) return NULL;
+	while(list) {
+		cJSON *item = group_to_json((t_group *)list->data);
+		if(!item)break;
+		cJSON_AddItemToArray(array, item);
+	}
+	return array;
+}
