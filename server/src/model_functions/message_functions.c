@@ -105,13 +105,21 @@ cJSON *message_to_json(t_message* msg) {
 	
 	if(!json) return NULL;
 
+	char *sender_b64 = base64_encode(msg->created_at, mx_strlen(msg->sender_username));
+	char *text_b64 = base64_encode(msg->text, mx_strlen(msg->text));
+	char *created_at_b64 = base64_encode(msg->created_at, mx_strlen(msg->created_at));
+
 	cJSON_AddNumberToObject(json, "id", (const double)msg->id);
 	cJSON_AddNumberToObject(json, "sent_by", (const double)msg->sent_by);
-	cJSON_AddStringToObject(json, "sender_username", msg->sender_username);
-	cJSON_AddStringToObject(json, text", msg->text);
+	cJSON_AddStringToObject(json, "sender_username", sender_b64);
+	cJSON_AddStringToObject(json, text", text_b64);
 	cJSON_AddNumberToObject(json, "group_id", (const double)msg->group_id);
-	cJSON_AddStringToObject(json, "created_at", msg->created_at);
-
+	cJSON_AddStringToObject(json, "created_at", created_at_b64);
+	
+	free(sender_b64);
+	free(text_b64);
+	free(created_at_b64);
+	
 	return json;
 }
 

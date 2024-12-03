@@ -114,13 +114,23 @@ cJSON *group_to_json(t_group* group) {
 	
 	if(!json) return NULL;
 
+	char *name_b64 = base64_encode(group->name, mx_strlen(group->name));
+	char *creator_name_b64 = base64_encode(group->creator_username, mx_strlen(group->creator_username));
+	char *created_at_b64 = base64_encode(group->created_at, mx_strlen(group->created_at));
+	char *last_msg_b64 = base64_encode(group->last_message_date, mx_strlen(group->last_message_date));
+
 	cJSON_AddNumberToObject(json, "id", (const double)group->id);
-	cJSON_AddStringToObject(json, "name", group->name);
+	cJSON_AddStringToObject(json, "name", name_b64);
 	cJSON_AddBoolToObject(json, "is_private", group->is_private == 1);
 	cJSON_AddNumberToObject(json, "created_by", (const double)group->created_by);
-	cJSON_AddStringToObject(json, "creator_username", group->creator_username);
-	cJSON_AddStringToObject(json, "created_at", user->created_at);
-	cJSON_AddStringToObject(json, "last_message_date", group->last_message_date);
+	cJSON_AddStringToObject(json, "creator_username", creator_name_b64);
+	cJSON_AddStringToObject(json, "created_at", created_at_b64);
+	cJSON_AddStringToObject(json, "last_message_date", last_msg_b64);
+
+	free(name_b64);
+	free(creator_name_b64 );
+	free(created_at_b64);
+	free(ast_msg_b64);
 
 	return json;
 }

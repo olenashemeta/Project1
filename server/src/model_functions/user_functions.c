@@ -105,12 +105,20 @@ cJSON *user_to_json(t_user* user) {
 	
 	if(!json) return NULL;
 
+	char *name_b64 = base64_encode(user->username, mx_strlen(user->username));
+	char *login_b64 = base64_encode(user->login, mx_strlen(user->login));
+	char *created_at_b64 = base64_encode(user->created_at, mx_strlen(user->created_at));
+
 	//cJSON_AddNumberToObject(json, "id", (const double)user->id);
 	cJSON_AddNumberToObject(json, "logo_id", (const double)user->logo_id);
-	cJSON_AddStringToObject(json, "username", user->username);
-	cJSON_AddStringToObject(json, "login", user->login);
+	cJSON_AddStringToObject(json, "username", name_b64);
+	cJSON_AddStringToObject(json, "login", login_b64);
 	//cJSON_AddStringToObject(json, "password", user->password);
-	cJSON_AddStringToObject(json, "created_at", user->created_at);
+	cJSON_AddStringToObject(json, "created_at", created_at_b64);
+
+	free(name_b64);
+	free(login_b64);
+	free(created_at_b64);
 
 	return json;
 }
