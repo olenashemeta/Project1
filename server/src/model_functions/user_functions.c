@@ -103,7 +103,7 @@ cJSON *user_to_json(t_user* user) {
 	if(!user) return NULL;
 	cJSON* json = cJSON_CreateObject();
 	
-	if(!json_payload || !user) return NULL;
+	if(!json) return NULL;
 
 	//cJSON_AddNumberToObject(json, "id", (const double)user->id);
 	cJSON_AddNumberToObject(json, "logo_id", (const double)user->logo_id);

@@ -103,7 +103,7 @@ cJSON *message_to_json(t_message* msg) {
 	if(!msg) return NULL;
 	cJSON* json = cJSON_CreateObject();
 	
-	if(!json_payload) return NULL;
+	if(!json) return NULL;
 
 	cJSON_AddNumberToObject(json, "id", (const double)msg->id);
 	cJSON_AddNumberToObject(json, "sent_by", (const double)msg->sent_by);

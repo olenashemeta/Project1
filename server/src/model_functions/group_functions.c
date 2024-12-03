@@ -112,7 +112,7 @@ cJSON *group_to_json(t_group* group) {
 	if(!group) return NULL;
 	cJSON* json = cJSON_CreateObject();
 	
-	if(!json_payload) return NULL;
+	if(!json) return NULL;
 
 	cJSON_AddNumberToObject(json, "id", (const double)group->id);
 	cJSON_AddStringToObject(json, "name", group->name);
