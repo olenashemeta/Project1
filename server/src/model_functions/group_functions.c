@@ -130,7 +130,7 @@ cJSON *group_to_json(t_group* group) {
 	free(name_b64);
 	free(creator_name_b64 );
 	free(created_at_b64);
-	free(ast_msg_b64);
+	free(last_msg_b64);
 
 	return json;
 }

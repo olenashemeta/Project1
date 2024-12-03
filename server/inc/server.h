@@ -159,7 +159,7 @@ t_group* group_create(const char* name, int created_by, int is_private);
 t_list* group_list_from_data_list(t_list* list);
 void free_group(t_group** group);
 void free_group_list(t_list* list);
-cJSON *group_to_json(t_group* group) 
+cJSON *group_to_json(t_group* group);
 cJSON *groups_list_to_json_array(t_list* list) ;
 
 //Server functions

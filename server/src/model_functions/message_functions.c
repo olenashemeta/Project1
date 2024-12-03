@@ -112,7 +112,7 @@ cJSON *message_to_json(t_message* msg) {
 	cJSON_AddNumberToObject(json, "id", (const double)msg->id);
 	cJSON_AddNumberToObject(json, "sent_by", (const double)msg->sent_by);
 	cJSON_AddStringToObject(json, "sender_username", sender_b64);
-	cJSON_AddStringToObject(json, text", text_b64);
+	cJSON_AddStringToObject(json, "text", text_b64);
 	cJSON_AddNumberToObject(json, "group_id", (const double)msg->group_id);
 	cJSON_AddStringToObject(json, "created_at", created_at_b64);
 	
@@ -127,7 +127,7 @@ cJSON *messages_list_to_json_array(t_list* list) {
 	cJSON *array = cJSON_CreateArray();
 	if(!array) return NULL;
 	while(list) {
-		cJSON *item = meesage_to_json((t_message *)list->data);
+		cJSON *item = message_to_json((t_message *)list->data);
 		if(!item)break;
 		cJSON_AddItemToArray(array, item);
 	}
