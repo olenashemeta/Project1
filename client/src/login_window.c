@@ -6,7 +6,7 @@ void login_window(GtkApplication *app, gpointer user_data) {
     GtkWidget *vbox;
     GtkWidget *logo, *title_label, *username_entry, *password_entry, *error_label;
     GtkWidget *login_button, *create_account_button;
-    t_main *main = (t_main *)user_data;
+    t_main *main_data = (t_main *)user_data;
 
     window = gtk_application_window_new(app);
     gtk_window_set_title(GTK_WINDOW(window), "CHAT");
@@ -49,17 +49,23 @@ void login_window(GtkApplication *app, gpointer user_data) {
 
     login_button = gtk_button_new_with_label("Log In");
     gtk_widget_set_name(login_button, "login_button");
-    gtk_box_pack_start(GTK_BOX(vbox), login_button, FALSE, FALSE, 5);
-    g_object_set_data(G_OBJECT(login_button), "main_data", main);
+
+    g_object_set_data(G_OBJECT(login_button), "main_data", main_data);
     g_object_set_data(G_OBJECT(login_button), "username_entry", username_entry);
     g_object_set_data(G_OBJECT(login_button), "password_entry", password_entry);
     g_object_set_data(G_OBJECT(login_button), "error_label", error_label);
+
+    gtk_box_pack_start(GTK_BOX(vbox), login_button, FALSE, FALSE, 5);
     g_signal_connect(login_button, "clicked", G_CALLBACK(on_login_button_clicked), NULL);
 
-    create_account_button = gtk_button_new_with_label("Beecome membeer");
+    create_account_button = gtk_button_new_with_label("Become Member");
     gtk_widget_set_name(create_account_button, "create_account_button");
+
+    g_object_set_data(G_OBJECT(create_account_button), "main_data", main_data);
+
     gtk_box_pack_start(GTK_BOX(vbox), create_account_button, FALSE, FALSE, 5);
     g_signal_connect(create_account_button, "clicked", G_CALLBACK(on_create_account_button_clicked), vbox);
 
     gtk_widget_show_all(window);
 }
+

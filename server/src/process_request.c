@@ -24,8 +24,8 @@ void process_request(t_packet *receive_data, t_client *client __attribute__((unu
     if (strcmp(request_type->valuestring, "login") == 0) {
         syslog(LOG_INFO, "Handling 'login' request");
         handle_login_request(json_payload);
-    } else {
-        syslog(LOG_WARNING, "Unknown request type: %s", request_type->valuestring);
+    } else if (strcmp(request_type->valuestring, "registration")) {
+        syslog(LOG_INFO, "Handling 'registration' request");
     }
 
     cJSON_Delete(json_payload);

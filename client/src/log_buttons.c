@@ -1,7 +1,7 @@
 #include "../inc/client.h"
 
 void on_create_account_button_clicked(GtkWidget *button, gpointer data) {
-    (void)button; // Указывает, что параметр намеренно не используется
+    t_main *main_data = (t_main *)g_object_get_data(G_OBJECT(button), "main_data");
 
     GtkWidget *vbox = GTK_WIDGET(data);
 
@@ -9,6 +9,7 @@ void on_create_account_button_clicked(GtkWidget *button, gpointer data) {
     for (GList *l = children; l != NULL; l = l->next) {
         gtk_widget_destroy(GTK_WIDGET(l->data));
     }
+    g_list_free(children);
 
     GtkWidget *logo = create_image("img/logo.svg", 110, 100);
     gtk_box_pack_start(GTK_BOX(vbox), logo, FALSE, FALSE, 0);
@@ -34,9 +35,9 @@ void on_create_account_button_clicked(GtkWidget *button, gpointer data) {
 
     GtkWidget *confirm_password_entry = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(confirm_password_entry), "Enter password again");
-     gtk_widget_set_name(confirm_password_entry, "confirm_password_entry");
+    gtk_widget_set_name(confirm_password_entry, "confirm_password_entry");
     gtk_entry_set_visibility(GTK_ENTRY(confirm_password_entry), FALSE); 
-        gtk_entry_set_max_length(GTK_ENTRY(confirm_password_entry), 100); 
+    gtk_entry_set_max_length(GTK_ENTRY(confirm_password_entry), 100); 
 
     GtkWidget *error_label = gtk_label_new("");
     gtk_widget_set_name(error_label, "error_label");
@@ -52,18 +53,18 @@ void on_create_account_button_clicked(GtkWidget *button, gpointer data) {
     gtk_box_pack_start(GTK_BOX(vbox), password_entry, FALSE, FALSE, 5);
     gtk_box_pack_start(GTK_BOX(vbox), confirm_password_entry, FALSE, FALSE, 5);
     gtk_box_pack_start(GTK_BOX(vbox), error_label, FALSE, FALSE, 5);
-
     gtk_box_pack_start(GTK_BOX(vbox), submit_create_account_button, FALSE, FALSE, 5);
     gtk_box_pack_start(GTK_BOX(vbox), back_to_login_button, FALSE, FALSE, 5);
 
+    g_object_set_data(G_OBJECT(submit_create_account_button), "main_data", main_data);
     g_object_set_data(G_OBJECT(submit_create_account_button), "username_entry", username_entry);
     g_object_set_data(G_OBJECT(submit_create_account_button), "login_entry", login_entry);
     g_object_set_data(G_OBJECT(submit_create_account_button), "password_entry", password_entry);
     g_object_set_data(G_OBJECT(submit_create_account_button), "confirm_password_entry", confirm_password_entry);
     g_object_set_data(G_OBJECT(submit_create_account_button), "error_label", error_label);
 
-    g_signal_connect(submit_create_account_button, "clicked", G_CALLBACK(on_submit_account_button_clicked), vbox);
 
+    g_signal_connect(submit_create_account_button, "clicked", G_CALLBACK(on_submit_account_button_clicked), vbox);
     g_signal_connect(back_to_login_button, "clicked", G_CALLBACK(restore_login_form), vbox);
 
     gtk_widget_show_all(vbox);
@@ -71,6 +72,7 @@ void on_create_account_button_clicked(GtkWidget *button, gpointer data) {
 
 void on_login_button_clicked(GtkWidget *button, gpointer data) {
     (void)data;
+    t_main *main_data = (t_main *)g_object_get_data(G_OBJECT(button), "main_data");
     GtkWidget *username_entry = GTK_WIDGET(g_object_get_data(G_OBJECT(button), "username_entry"));
     GtkWidget *password_entry = GTK_WIDGET(g_object_get_data(G_OBJECT(button), "password_entry"));
     GtkWidget *error_label = GTK_WIDGET(g_object_get_data(G_OBJECT(button), "error_label")); 
@@ -88,6 +90,8 @@ void on_login_button_clicked(GtkWidget *button, gpointer data) {
     g_print("Login: %s\n", user->login);
     g_print("Password: %s\n", user->password);
     
+    cJSON *login_request = form_login_request(user->login, user->password);
+    prepare_and_send_json(login_request, main_data);
     // wait for server
 
     mx_free_user(user);
@@ -96,7 +100,8 @@ void on_login_button_clicked(GtkWidget *button, gpointer data) {
 void on_submit_account_button_clicked(GtkWidget *button, gpointer data) {
     GtkWidget *vbox = GTK_WIDGET(data);
     (void)vbox;
-
+    
+    t_main *main_data = (t_main *)g_object_get_data(G_OBJECT(button), "main_data");
     GtkWidget *username_entry = GTK_WIDGET(g_object_get_data(G_OBJECT(button), "username_entry"));
     GtkWidget *login_entry = GTK_WIDGET(g_object_get_data(G_OBJECT(button), "login_entry"));
     GtkWidget *password_entry = GTK_WIDGET(g_object_get_data(G_OBJECT(button), "password_entry"));
@@ -135,6 +140,9 @@ void on_submit_account_button_clicked(GtkWidget *button, gpointer data) {
     g_print("Username: %s\n", user->name);
     g_print("Login: %s\n", user->login);
     g_print("Password: %s\n", user->password);
+
+    cJSON *register_requset = form_register_request(user->login, user->name, user->password);
+    prepare_and_send_json(register_requset, main_data);
 	// відповідь від сервера
 	
 	mx_free_user(user);

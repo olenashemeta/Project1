@@ -9,6 +9,7 @@ void restore_login_form(GtkWidget *button, gpointer data) {
     for (GList *l = children; l != NULL; l = l->next) {
         gtk_widget_destroy(GTK_WIDGET(l->data));
     }
+    g_list_free(children);
 
     GtkWidget *logo = create_image("img/logo.svg", 110, 100);
     gtk_box_pack_start(GTK_BOX(vbox), logo, FALSE, FALSE, 0);

@@ -29,6 +29,40 @@ cJSON *form_login_request(const char *login, const char *password) {
     return json_payload;
 }
 
+cJSON *form_register_request(const char *login, const char *username, const char *password) {
+    cJSON *json_payload = cJSON_CreateObject();
+
+    if (!json_payload) {    
+        printf("Error creating JSON object\n");
+        return NULL;
+    }
+
+    cJSON_AddStringToObject(json_payload, "request_type", "registration");
+
+    unsigned char hash_login[SHA256_DIGEST_LENGTH];
+    unsigned char hash_password[SHA256_DIGEST_LENGTH];
+
+    SHA256((const unsigned char *)login, strlen(login), hash_login);
+    SHA256((const unsigned char *)password, strlen(password), hash_password);
+
+    char *hash_login_b64 = base64_encode(hash_login, SHA256_DIGEST_LENGTH);
+    char *username_b64 = base64_encode((const unsigned char *)username, strlen(username));
+    char *hash_password_b64 = base64_encode(hash_password, SHA256_DIGEST_LENGTH);
+    
+    cJSON_AddStringToObject(json_payload, "userlogin", hash_login_b64);
+    cJSON_AddStringToObject(json_payload, "username", username_b64);
+    cJSON_AddStringToObject(json_payload, "password", hash_password_b64);
+
+    free(hash_login_b64);
+    free(username_b64);
+    free(hash_password_b64);
+    
+    return json_payload;
+}
+
+// cJSON *forn_change_avatar_request() {
+
+// }
 
 cJSON *form_aes_key_transfer(const unsigned char *aes_key, const unsigned char *iv, EVP_PKEY *pubkey) {
     cJSON *json_payload = cJSON_CreateObject();

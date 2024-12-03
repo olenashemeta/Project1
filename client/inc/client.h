@@ -79,6 +79,7 @@ void mx_free_main_data(t_main *main);
 
 //func json request
 cJSON *form_login_request(const char *login, const char *password);
+cJSON *form_register_request(const char *login, const char *username, const char *password);
 cJSON *form_aes_key_transfer(const unsigned char *aes_key, const unsigned char *iv, EVP_PKEY *pubkey);
 
 
@@ -86,16 +87,12 @@ cJSON *form_aes_key_transfer(const unsigned char *aes_key, const unsigned char *
 char *base64_encode(const unsigned char *input, size_t input_len);
 unsigned char *base64_decode(const char *input, size_t *output_len);
 
-//request utils func
+//message utils func (for requests and receipts)
 t_packet *create_message(const char *data, size_t data_len);
 void free_message(t_packet *req);
 void prepare_and_send_json(cJSON *json_payload, t_main *main);
 void send_message(t_packet *reg, int socket);
-
-//receiving a response from the server
 t_packet *receive_message(int socket_fd);
-t_packet *create_receive(int len, const char *data);
-
 
 //UI LOGIN REGISTER PAGE FUNC
 
@@ -105,6 +102,7 @@ GtkWidget* create_image(const char *image_path, int width, int height);
 t_user* mx_create_user(const char* login, const char* name, const char* password);
 void mx_free_user(t_user* new_user);
 t_user* mx_create_log_user(const char* login, const char* password);
+
 //buttons
 void on_create_account_button_clicked(GtkWidget *button, gpointer data);
 void on_login_button_clicked(GtkWidget *button, gpointer data);

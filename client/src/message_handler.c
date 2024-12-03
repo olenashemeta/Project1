@@ -65,6 +65,16 @@ void prepare_and_send_json(cJSON *json_payload, t_main *main) {
         return;
     }
 
+    // if (!json_payload) {
+    //     fprintf(stderr, "ehh we have problem with json");
+    //     return;
+    // }
+
+    // if (!main) {
+    //     fprintf(stderr, "wow we have problem with main, but why??");
+    //     return;
+    // }
+
     size_t encrypted_data_len;
     unsigned char *encrypted_data = encrypt_json_with_aes(main->keys.aes_key, main->keys.aes_iv, json_payload, &encrypted_data_len);
     if (!encrypted_data) {
