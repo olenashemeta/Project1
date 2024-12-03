@@ -1,7 +1,7 @@
 #include "../inc/client.h"
 #include <time.h>
 
-char* get_current_time() {
+char* get_current_time(void) {
     time_t rawtime;
     struct tm *timeinfo;
     static char time_buffer[6]; 
@@ -23,7 +23,7 @@ void add_message_to_chat(const char *message, const char *file_path) {
     gtk_widget_set_margin_bottom(message_box, 5);
 
     gboolean is_user_message = (message != NULL); 
-
+    (void)is_user_message;
     gtk_widget_set_halign(message_box, GTK_ALIGN_END);
 
     GtkWidget *content_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 3);

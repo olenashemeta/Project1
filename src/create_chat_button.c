@@ -1,6 +1,8 @@
 #include "../inc/client.h"
 
 void on_create_chat_clicked(GtkButton *button, gpointer user_data) {
+    (void)button;
+    (void)user_data;
     GtkWidget *dialog = gtk_dialog_new_with_buttons(
         "Створити чат",
         NULL,

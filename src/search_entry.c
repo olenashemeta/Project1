@@ -1,6 +1,7 @@
 #include "../inc/client.h"
 
 void on_search_changed(GtkEntry *entry, gpointer user_data) {
+    (void)user_data;
     const char *search_text = gtk_entry_get_text(entry);
     GList *rows = gtk_container_get_children(GTK_CONTAINER(chat_list));
 

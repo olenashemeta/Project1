@@ -1,6 +1,7 @@
 #include "../inc/client.h"
 
 void on_file_button_clicked(GtkButton *button, gpointer user_data) {
+    (void)button;
     GtkWidget *parent_window = GTK_WIDGET(user_data);
 
     GtkWidget *dialog = gtk_file_chooser_dialog_new(

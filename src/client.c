@@ -1,12 +1,14 @@
 #include "../inc/client.h"
 
 static void on_login_button_clicked(GtkButton *button, gpointer user_data) {
+    (void)button;
     GtkLabel *label = GTK_LABEL(user_data);
     gtk_label_set_text(label, "Reconnecting...");
     mx_connect_to_server(label);
 }
 
-static void activate(GtkApplication *app, gpointer user_data) {
+static void __attribute__((unused)) activate(GtkApplication *app, gpointer user_data) {
+    (void)user_data;
     GtkWidget *window;
     GtkWidget *window_box;
     GtkWidget *button;

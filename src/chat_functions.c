@@ -1,6 +1,7 @@
 #include "../inc/client.h"
 
 void add_chat_item(GtkButton *button, const char *chat_name) {
+    (void)button;
     GtkWidget *chat_item = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     GtkWidget *label = gtk_label_new(chat_name);
     GtkWidget *close_button = gtk_button_new_with_label("X");
@@ -17,7 +18,7 @@ void add_chat_item(GtkButton *button, const char *chat_name) {
     gtk_widget_show_all(row);
 }
 
-void clear_message_area() {
+void clear_message_area(void) {
     GList *children = gtk_container_get_children(GTK_CONTAINER(message_area));
     for (GList *iter = children; iter != NULL; iter = iter->next) {
         gtk_widget_destroy(GTK_WIDGET(iter->data));
@@ -26,6 +27,8 @@ void clear_message_area() {
 }
 
 void on_chat_selected(GtkListBox *box, GtkListBoxRow *row, gpointer user_data) {
+    (void)box;
+    (void)user_data;
     if (GTK_WIDGET(row) != current_chat) {
         current_chat = GTK_WIDGET(row);
         clear_message_area(); 

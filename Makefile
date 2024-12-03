@@ -1,8 +1,7 @@
 CC = clang
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -D_GNU_SOURCE \
-         `pkg-config --cflags gtk+-3.0` -pthread -I../libs/JsonLib -I../libs/libmx/
-LDFLAGS = `pkg-config --libs gtk+-3.0` -lssl -lcrypto \
-          ../libs/JsonLib/libcjson.a ../libs/libmx/libmx.a -Wl,-rpath=../libs/JsonLib
+         `pkg-config --cflags gtk+-3.0` -pthread
+LDFLAGS = `pkg-config --libs gtk+-3.0` -lssl -lcrypto
 
 SRC_DIR = src
 OBJ_DIR = obj

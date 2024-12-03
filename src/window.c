@@ -79,6 +79,7 @@ void show_chat_window(GtkApplication *app) {
     GtkCssProvider *css_provider = gtk_css_provider_new();
     gtk_css_provider_load_from_path(css_provider, "styles.css", NULL);
     GtkStyleContext *style_context = gtk_widget_get_style_context(window);
+    (void)style_context;
     gtk_style_context_add_provider_for_screen(
         gdk_screen_get_default(),
         GTK_STYLE_PROVIDER(css_provider),
