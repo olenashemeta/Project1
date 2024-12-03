@@ -3,17 +3,20 @@
 t_packet *receive_message(int socket_fd) {
     size_t len;
 
+    // Получаем длину сообщения
     ssize_t rec_data = recv(socket_fd, &len, sizeof(len), 0);
-    if (rec_data <= 0){
+    if (rec_data <= 0) {
         return NULL;
     }
 
+    // Создаем сообщение с выделением памяти под данные
     t_packet *data = create_message(NULL, len);
     if (!data) {
         return NULL;
     }
 
-    rec_data = recv(socket_fd, data->data, data->len, 0);
+    // Получаем данные сообщения
+    rec_data = recv(socket_fd, data->data, len, 0);
     if (rec_data <= 0) {
         free_message(data);
         return NULL;
@@ -29,13 +32,15 @@ t_packet *create_message(const char *data, size_t data_len) {
     }
 
     request->len = data_len;
-    request->data = malloc(request->len);
+    request->data = malloc(data_len);
     if (!request->data) {
         free(request);
         return NULL;
     }
 
-    memcpy(request->data, data, data_len);
+    if (data) 
+        memcpy(request->data, data, data_len);
+
     return request;
 }
 

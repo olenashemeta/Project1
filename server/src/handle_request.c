@@ -22,9 +22,7 @@ void handle_login_request(cJSON *json_payload, t_client *client) {
     
     cJSON *json = cJSON_CreateObject();
     cJSON_AddStringToObject(json, "response_type", "login");
-    syslog(LOG_INFO, "before db_user_read_by_login");
     t_user * user = db_user_read_by_login(userlogin);
-    syslog(LOG_INFO, "after");
 
     if (!user) {
         cJSON_AddBoolToObject(json, "status", false);
@@ -50,9 +48,7 @@ void handle_login_request(cJSON *json_payload, t_client *client) {
         }
         free_user(&user);
     }
-    syslog(LOG_INFO, "after ifa");
     prepare_and_send_json(json, client);
-    syslog(LOG_INFO, "ehhh why?");
 
     syslog(LOG_INFO, "Login request received. Userlogin: %s, Userpassword: %s", userlogin, password);
     

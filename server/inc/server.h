@@ -34,7 +34,7 @@ typedef struct s_keys {
 }				t_keys;
 
 typedef struct t_packet{
-	int len;
+	size_t len;
 	char *data;
 }				t_packet;
 

@@ -29,7 +29,7 @@ t_packet *create_packet(const char *data, size_t data_len) {
     }
     
     receive->len = data_len;
-    receive->data = (char *)malloc(receive->len);
+    receive->data = (char *)malloc(receive->len * sizeof(char));
     if (!receive->data) {
         free(receive);
         return NULL;
@@ -86,5 +86,4 @@ void prepare_and_send_json(cJSON *json_payload, t_client *client) {
     cJSON_Delete(json_payload);
     free(encrypted_data);
 }
-
 
