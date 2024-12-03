@@ -105,9 +105,9 @@ cJSON *user_to_json(t_user* user) {
 	
 	if(!json) return NULL;
 
-	char *name_b64 = base64_encode(user->username, mx_strlen(user->username));
-	char *login_b64 = base64_encode(user->login, mx_strlen(user->login));
-	char *created_at_b64 = base64_encode(user->created_at, mx_strlen(user->created_at));
+	char *name_b64 = base64_encode((const unsigned char*)user->username, mx_strlen(user->username));
+	char *login_b64 = base64_encode((const unsigned char*)user->login, mx_strlen(user->login));
+	char *created_at_b64 = base64_encode((const unsigned char*)user->created_at, mx_strlen(user->created_at));
 
 	//cJSON_AddNumberToObject(json, "id", (const double)user->id);
 	cJSON_AddNumberToObject(json, "logo_id", (const double)user->logo_id);

@@ -105,9 +105,9 @@ cJSON *message_to_json(t_message* msg) {
 	
 	if(!json) return NULL;
 
-	char *sender_b64 = base64_encode(msg->created_at, mx_strlen(msg->sender_username));
-	char *text_b64 = base64_encode(msg->text, mx_strlen(msg->text));
-	char *created_at_b64 = base64_encode(msg->created_at, mx_strlen(msg->created_at));
+	char *sender_b64 = base64_encode((const unsigned char*)msg->created_at, mx_strlen(msg->sender_username));
+	char *text_b64 = base64_encode((const unsigned char*)msg->text, mx_strlen(msg->text));
+	char *created_at_b64 = base64_encode((const unsigned char*)msg->created_at, mx_strlen(msg->created_at));
 
 	cJSON_AddNumberToObject(json, "id", (const double)msg->id);
 	cJSON_AddNumberToObject(json, "sent_by", (const double)msg->sent_by);

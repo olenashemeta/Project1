@@ -114,10 +114,10 @@ cJSON *group_to_json(t_group* group) {
 	
 	if(!json) return NULL;
 
-	char *name_b64 = base64_encode(group->name, mx_strlen(group->name));
-	char *creator_name_b64 = base64_encode(group->creator_username, mx_strlen(group->creator_username));
-	char *created_at_b64 = base64_encode(group->created_at, mx_strlen(group->created_at));
-	char *last_msg_b64 = base64_encode(group->last_message_date, mx_strlen(group->last_message_date));
+  	char *name_b64 = base64_encode((const unsigned char*)group->name, mx_strlen(group->name));
+    char *creator_name_b64 = base64_encode((const unsigned char*)group->creator_username, mx_strlen(group->creator_username));
+    char *created_at_b64 = base64_encode((const unsigned char*)group->created_at, mx_strlen(group->created_at));
+    char *last_msg_b64 = base64_encode((const unsigned char*)group->last_message_date, mx_strlen(group->last_message_date));
 
 	cJSON_AddNumberToObject(json, "id", (const double)group->id);
 	cJSON_AddStringToObject(json, "name", name_b64);

@@ -20,22 +20,23 @@ void handle_login_request(cJSON *json_payload, t_client *client) {
     }
     const char *password = password_item->valuestring;
     
-     cJSON *json = cJSON_CreateObject();
-     cJSON_AddStringToObject(json, "response_type", "login");
-
+    cJSON *json = cJSON_CreateObject();
+    cJSON_AddStringToObject(json, "response_type", "login");
+    syslog(LOG_INFO, "before db_user_read_by_login");
     t_user * user = db_user_read_by_login(userlogin);
-    
-    if(!user) {
-         cJSON_AddBoolToObject(json, "status", false);
-         cJSON_AddStringToObject(json, "data", "Couldn't find a user with this login.");
+    syslog(LOG_INFO, "after");
+
+    if (!user) {
+        cJSON_AddBoolToObject(json, "status", false);
+        cJSON_AddStringToObject(json, "data", "Couldn't find a user with this login.");
     }
+
     else {
         if(strcmp(user->password, password) == 0) {
             cJSON *json_user = user_to_json(user);
             if(!json_user) {
                 cJSON_AddBoolToObject(json, "status", false);
                 cJSON_AddStringToObject(json, "data", "Server error.");
-                cJSON_Delete(json_user);
             }
             else {
                 cJSON_AddBoolToObject(json, "status", true);
@@ -45,13 +46,13 @@ void handle_login_request(cJSON *json_payload, t_client *client) {
         }
         else {
             cJSON_AddBoolToObject(json, "status", false);
-            cJSON_AddItemToObject(json, "data", "Wrong password.");
+            cJSON_AddStringToObject(json, "data", "Wrong password.");
         }
-       
+        free_user(&user);
     }
-
+    syslog(LOG_INFO, "after ifa");
     prepare_and_send_json(json, client);
-    free_user(&user);
+    syslog(LOG_INFO, "ehhh why?");
 
     syslog(LOG_INFO, "Login request received. Userlogin: %s, Userpassword: %s", userlogin, password);
     
