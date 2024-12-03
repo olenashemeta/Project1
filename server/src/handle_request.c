@@ -23,16 +23,31 @@ void handle_login_request(cJSON *json_payload, t_client *client) {
      cJSON *json = cJSON_CreateObject();
      cJSON_AddStringToObject(json, "response_type", "login");
 
-    t_user * user = db_user_read_by_login();
+    t_user * user = db_user_read_by_login(userlogin);
     
-    cJSON *json_user = user_to_json(user);
-    if(!json_user) {
+    if(!user) {
          cJSON_AddBoolToObject(json, "status", false);
-         cJSON_AddStringToObject(json, "data", "User could not be found");
+         cJSON_AddStringToObject(json, "data", "Couldn't find a user with this login.");
     }
     else {
-        cJSON_AddBoolToObject(json, "status", true);
-        cJSON_AddItemToObject(json, "data", json_user);
+        if(strcmp(user->password, password) == 0) {
+            cJSON *json_user = user_to_json(user);
+            if(!json_user) {
+                cJSON_AddBoolToObject(json, "status", false);
+                cJSON_AddStringToObject(json, "data", "Server error.");
+                cJSON_Delete(json_user);
+            }
+            else {
+                cJSON_AddBoolToObject(json, "status", true);
+                cJSON_AddItemToObject(json, "data", json_user);
+                client->id_db = user->id;
+            }
+        }
+        else {
+            cJSON_AddBoolToObject(json, "status", false);
+            cJSON_AddItemToObject(json, "data", "Wrong password.");
+        }
+       
     }
 
     prepare_and_send_json(json, client);

@@ -105,11 +105,11 @@ cJSON *user_to_json(t_user* user) {
 	
 	if(!json_payload || !user) return NULL;
 
-	cJSON_AddNumberToObject(json, "id", (const double)user->id);
+	//cJSON_AddNumberToObject(json, "id", (const double)user->id);
 	cJSON_AddNumberToObject(json, "logo_id", (const double)user->logo_id);
 	cJSON_AddStringToObject(json, "username", user->username);
 	cJSON_AddStringToObject(json, "login", user->login);
-	cJSON_AddStringToObject(json, "password", user->password);
+	//cJSON_AddStringToObject(json, "password", user->password);
 	cJSON_AddStringToObject(json, "created_at", user->created_at);
 
 	return json;
