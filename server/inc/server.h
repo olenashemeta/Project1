@@ -143,24 +143,18 @@ t_user* user_from_data_list(t_list* list);
 t_list* user_list_from_data_list(t_list* list);
 void free_user(t_user** user);
 void free_user_list(t_list* list);
-cJSON *user_to_json(t_user* user);
-cJSON* users_list_to_json_array(t_list* list);
 
 t_message* message_create(int sent_by, const char* text, int group_id);
 t_message* message_from_data_list(t_list* list);
 t_list* message_list_from_data_list(t_list* list);
 void free_message(t_message** message);
 void free_message_list(t_list* list);
-cJSON *message_to_json(t_message* msg);
-cJSON *messages_list_to_json_array(t_list* list);
 
 t_group* group_from_data_list(t_list* list);
 t_group* group_create(const char* name, int created_by, int is_private);
 t_list* group_list_from_data_list(t_list* list);
 void free_group(t_group** group);
 void free_group_list(t_list* list);
-cJSON *group_to_json(t_group* group) 
-cJSON *groups_list_to_json_array(t_list* list) ;
 
 //Server functions
 
@@ -172,7 +166,7 @@ int start_server(t_server *server, const char *port);
 
 //Func to communicate with the client
 void *handle_client(void *arg);
-void handle_login_request(cJSON* json);
+void handle_login_request(cJSON* json, t_client *client);
 t_client *create_new_client(int socket_fd);
 void free_client(t_client *client);
 void process_request(t_packet *receive_data, t_client *client);

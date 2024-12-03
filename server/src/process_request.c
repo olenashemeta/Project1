@@ -1,6 +1,6 @@
-#include "../inc/server.h"
+﻿#include "../inc/server.h"
 //добавлен атрибут так как пока что структура t_client не используеться в этой функции
-void process_request(t_packet *receive_data, t_client *client __attribute__((unused))) {
+void process_request(t_packet *receive_data, t_client *client) {
     if (!receive_data || !receive_data->data) {
         syslog(LOG_ERR, "Invalid t_receive structure in process_request");
         return;
@@ -23,7 +23,7 @@ void process_request(t_packet *receive_data, t_client *client __attribute__((unu
 
     if (strcmp(request_type->valuestring, "login") == 0) {
         syslog(LOG_INFO, "Handling 'login' request");
-        handle_login_request(json_payload);
+        handle_login_request(json_payload, client);
     } else if (strcmp(request_type->valuestring, "registration")) {
         syslog(LOG_INFO, "Handling 'registration' request");
     }
