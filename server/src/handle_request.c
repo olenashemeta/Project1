@@ -53,3 +53,36 @@ void handle_login_request(cJSON *json_payload, t_client *client) {
     syslog(LOG_INFO, "Login request received. Userlogin: %s, Userpassword: %s", userlogin, password);
     
 }
+
+void handle_register_request(cJSON *json_payload, t_client *client __attribute__((unused))) {
+
+    if (!json_payload) {
+        syslog(LOG_ERR, "Invalid JSON payload in handle_register_request");
+        return;
+    }
+
+    cJSON *login_item = cJSON_GetObjectItemCaseSensitive(json_payload, "userlogin");
+    if (!cJSON_IsString(login_item) || !login_item->valuestring) {
+        syslog(LOG_ERR, "Missing or invalid 'userlogin' in register request");
+        return;
+    }
+
+
+    cJSON *username_item = cJSON_GetObjectItemCaseSensitive(json_payload, "username");
+    if (!cJSON_IsString(username_item) || !username_item->valuestring) {
+        syslog(LOG_ERR, "Missing or invalid 'username' in register request");
+        return;
+    }
+    
+    cJSON *password_item = cJSON_GetObjectItemCaseSensitive(json_payload, "password");
+    if (!cJSON_IsString(password_item) || !password_item->valuestring) {
+        syslog(LOG_ERR, "Missing or invalid 'password' in register request");
+        return;
+    }
+
+    const char *user_login = login_item->valuestring;
+    const char *username = username_item->valuestring;
+    const char *user_password = password_item->valuestring;
+
+    syslog(LOG_INFO, "Register request received. Login: %s, Username: %s, Password: %s", user_login, username, user_password);
+}

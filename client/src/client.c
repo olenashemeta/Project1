@@ -5,7 +5,15 @@ t_main *main_data;
 static void *connection(void *arg) {
     t_main *main = (t_main *)arg;
 
-    while (!main->is_closing) {
+    while (true) {
+        pthread_mutex_lock(&main->lock);
+        bool is_closing = main->is_closing;
+        pthread_mutex_unlock(&main->lock);
+
+        if (is_closing) {
+            break;
+        }
+
         main->socket = mx_connect_to_server(main);
         if (main->socket == -1) {
             printf("Failed to connect to server. Retrying in %d seconds...\n", main->rec_delay);
@@ -14,19 +22,39 @@ static void *connection(void *arg) {
         }
 
         printf("Connected to server.\n");
+
+        pthread_mutex_lock(&main->lock);
         main->is_connected = true;
+        pthread_mutex_unlock(&main->lock);
 
         if (handshake(main) != 0) {
             fprintf(stderr, "Handshake failed. Retrying connection...\n");
             close(main->socket);
+
+            pthread_mutex_lock(&main->lock);
             main->is_connected = false;
+            pthread_mutex_unlock(&main->lock);
+
             continue;
         }
 
         printf("Handshake succeeded. AES session established.\n");
 
         t_packet *received_data = NULL;
-        while (!main->is_closing && (received_data = receive_message(main->socket)) != NULL) {
+        while (true) {
+            pthread_mutex_lock(&main->lock);
+            bool local_is_closing = main->is_closing;
+            pthread_mutex_unlock(&main->lock);
+
+            if (local_is_closing) {
+                break;
+            }
+
+            received_data = receive_message(main->socket);
+            if (!received_data) {
+                break;
+            }
+
             if (decrypt_received_data(received_data, main->keys.aes_key, main->keys.aes_iv) == -1) {
                 fprintf(stderr, "Failed to decrypt data\n");
                 free_message(received_data);
@@ -34,19 +62,14 @@ static void *connection(void *arg) {
             }
 
             process_response(received_data);
-
             free_message(received_data);
-            
-            // pthread_mutex_lock(&main->lock);
-            // cJSON_Delete(main->server_response);
-            // main->server_response = json_response;
-            // main->has_new_data = true;
-            // pthread_cond_signal(&main->cond);
-            // pthread_mutex_unlock(&main->lock);
         }
 
         close(main->socket);
+
+        pthread_mutex_lock(&main->lock);
         main->socket = -1;
+        pthread_mutex_unlock(&main->lock);
     }
 
     printf("Closing connection thread.\n");

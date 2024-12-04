@@ -173,9 +173,11 @@ int start_server(t_server *server, const char *port);
 //Func to communicate with the client
 void *handle_client(void *arg);
 void handle_login_request(cJSON* json_payload, t_client *client);
+void handle_register_request(cJSON *json_payload, t_client *client);
 t_client *create_new_client(int socket_fd);
 void free_client(t_client *client);
 void process_request(t_packet *receive_data, t_client *client);
+
 
 //security func
 unsigned char *encrypt_json_with_aes(const unsigned char *aes_key, const unsigned char *iv, 

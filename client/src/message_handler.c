@@ -3,19 +3,16 @@
 t_packet *receive_message(int socket_fd) {
     size_t len;
 
-    // Получаем длину сообщения
     ssize_t rec_data = recv(socket_fd, &len, sizeof(len), 0);
     if (rec_data <= 0) {
         return NULL;
-    }
+    } 
 
-    // Создаем сообщение с выделением памяти под данные
     t_packet *data = create_message(NULL, len);
     if (!data) {
         return NULL;
     }
 
-    // Получаем данные сообщения
     rec_data = recv(socket_fd, data->data, len, 0);
     if (rec_data <= 0) {
         free_message(data);
@@ -69,6 +66,18 @@ void prepare_and_send_json(cJSON *json_payload, t_main *main) {
         fprintf(stderr, "Invalid arguments to prepare_and_send_json\n");
         return;
     }
+
+    // if (!json_payload) {
+    //     fprintf(stderr, "ehh we have problem with json");
+    //     return;
+    // }
+    // if (!main) {
+    //     fprintf(stderr, "wow we have problem with main, but why??\n");
+    //     return;
+    // }
+    
+    fprintf(stderr, "Debug main: socket=%d, is_connected=%d, aes_key=%p, aes_iv=%p\n",
+        main->socket, main->is_connected, (void *)main->keys.aes_key, (void *)main->keys.aes_iv);
 
     size_t encrypted_data_len;
     unsigned char *encrypted_data = encrypt_json_with_aes(main->keys.aes_key, main->keys.aes_iv, json_payload, &encrypted_data_len);
