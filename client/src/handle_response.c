@@ -31,3 +31,15 @@ void handle_login_response(cJSON *json_payload) {
         }
     }
 }
+
+void handle_register_respone(cJSON *json_payload) {
+    cJSON *status = cJSON_GetObjectItemCaseSensitive(json_payload, "status");
+        if (!cJSON_IsBool(status)) {
+        fprintf(stderr, "Missing or invalid 'status' in JSON data\n");
+        return;
+    }
+
+    if (status->valueint) {
+
+    }
+}

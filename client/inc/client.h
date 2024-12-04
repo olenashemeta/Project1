@@ -42,12 +42,14 @@ typedef struct s_main {
 	int port;
 	bool is_connected;
 	bool is_closing;
-	bool status;
-	//cJSON *server_response;
 	pthread_mutex_t lock;
 	pthread_cond_t cond;
-	//bool has_new_data;
 	t_keys keys;
+
+	bool status;
+	//cJSON *server_response;
+	//bool has_new_data;
+
 
 }				t_main;
 

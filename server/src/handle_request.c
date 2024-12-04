@@ -89,23 +89,24 @@ void handle_register_request(cJSON *json_payload, t_client *client) {
 
     t_user* user = user_create(username, user_login, user_password, 1);
     int user_id = db_user_create(user);
-  
-    if(user_id < 0) {
+
+
+    if (user_id < 0) {
         cJSON_AddBoolToObject(json, "status", false);
         cJSON_AddStringToObject(json, "data", "Could not record user data.");
     }
     else {
         cJSON *json_user = user_to_json(user);
         if(!json_user) {
-             cJSON_AddBoolToObject(json, "status", false);
-             cJSON_AddStringToObject(json, "data", "Server error.");
+            cJSON_AddBoolToObject(json, "status", false);
+            cJSON_AddStringToObject(json, "data", "Server error.");
         }
         else {
             client->id_db = user_id;
             cJSON_AddBoolToObject(json, "status", true);
             cJSON_AddItemToObject(json, "data", json_user);
         }
-        free_user(&user) ;
+        free_user(&user);
     }
 
     prepare_and_send_json(json, client);
