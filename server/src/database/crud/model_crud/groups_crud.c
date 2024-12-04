@@ -12,46 +12,55 @@ int db_group_create(t_group* group)
 	return ret;
 }
 
-void db_group_delete(t_group* group)
+bool db_group_delete(t_group* group)
 {
 	char* where = NULL;
 	if (group->id > 0)asprintf(&where, "id = %d", group->id);
 
-	database_delete("groups", where);
+	bool res = database_delete("groups", where);
 
 	mx_strdel(&where);
+
+	return res;
 }
 
-void db_group_delete_by_id(int id)
+bool db_group_delete_by_id(int id)
 {
 	char* where = NULL;
 	asprintf(&where, "id = %d", id);
 
-	database_delete("groups", where);
+	bool res = database_delete("groups", where);
 
 	mx_strdel(&where);
+
+	return res;
 }
 
-void db_group_delete_by_named_field(const char* field, const char* value)
+bool db_group_delete_by_named_field(const char* field, const char* value)
 {
 	char* where = NULL;
 	asprintf(&where, "%s = '%s'", field, value);
 
-	database_delete("groups", where);
+	bool res = database_delete("groups", where);
 
 	mx_strdel(&where);
+
+	return res;
 }
 
-void db_group_update(t_group* group)
+bool db_group_update(t_group* group)
 {
 	char* where = NULL;
 	char* set = NULL;
 	asprintf(&where, "id = %d", group->id);
 	asprintf(&set, "name = '%s', created_by = %d", group->name, group->created_by);
-	database_update("groups", set, where);
+	
+	bool res = database_update("groups", set, where);
 
 	mx_strdel(&where);
 	mx_strdel(&set);
+
+	return res;
 }
 
 t_group* db_group_read_by_id(int id) {
@@ -70,7 +79,7 @@ t_group* db_group_read_by_id(int id) {
 
 t_list* db_group_read_all(void) {
 
-	t_list* list = database_read("groups.id, groups.name, groups.is_private, groups.created_by, users.username, groups.created_at, max(messages.created_at) as last_message", "groups INNER JOIN users ON groups.created_by = users.id LEFT JOIN messages ON groups.id = group_id GROUP BY groups.id ORDER BY last_message DESC", NULL);
+	t_list* list = database_read("groups.id, groups.name, groups.is_private, groups.created_by, users.username, groups.created_at, max(messages.created_at) as last_message", "groups INNER JOIN users ON groups.created_by = users.id INNER JOIN messages ON groups.id = group_id GROUP BY groups.id ORDER BY last_message DESC", NULL);
 	t_list* ret = group_list_from_data_list(list);
 
 	mx_del_list(list, mx_list_size(list));

@@ -135,7 +135,7 @@ int db_user_add_to_group(int user_id, int group_id);
 bool db_user_remove_from_froup(int user_id, int group_id);
 
 //Error handling
-void validate_database_operation(int rc, sqlite3* db, char* error);
+bool validate_database_operation(int rc, sqlite3* db, char* error);
 
 //Model functions
 t_user* user_create(const char* username, const char* login, const char* password, int logo_id);
