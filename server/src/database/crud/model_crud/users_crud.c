@@ -34,7 +34,7 @@ bool db_user_delete_by_id(int id)
 
 	mx_strdel(&where);
 
-	retrun res;
+	return res;
 }
 
 bool db_user_delete_by_named_field(const char *field, const char *value)
