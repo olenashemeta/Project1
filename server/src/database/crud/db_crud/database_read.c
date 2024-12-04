@@ -21,7 +21,7 @@ t_list *database_read(const char* select, const char* from, const char* where) {
     t_list* res = NULL;
     int rc = sqlite3_open(exe_path, &db);
 
-    validate_database_operation(rc, db, NULL);
+    if(!validate_database_operation(rc, db, NULL)) return NULL;
 
     if (where == NULL) {
         asprintf(&command, "SELECT %s FROM %s", select, from);
@@ -30,7 +30,8 @@ t_list *database_read(const char* select, const char* from, const char* where) {
         asprintf(&command, "SELECT %s FROM %s WHERE %s", select, from, where);
     }
     rc = sqlite3_exec(db, command, callback, &res, &error);
-    validate_database_operation(rc, db, error);
+    
+    if(!validate_database_operation(rc, db, error)) return NULL;
 
     mx_strdel(&command);
     sqlite3_close(db);

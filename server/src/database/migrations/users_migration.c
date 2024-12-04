@@ -6,7 +6,7 @@ void users_migration_up(void) {
     char* command = NULL;
     int rc = sqlite3_open(exe_path, &db);
 
-    validate_database_operation(rc, db, NULL);
+    if(!validate_database_operation(rc, db, NULL)) return;
 
     rc = sqlite3_exec(db,
         "CREATE TABLE IF NOT EXISTS users ("
@@ -28,7 +28,7 @@ void users_migration_down(void) {
     char* command = NULL;
     int rc = sqlite3_open(exe_path, &db);
 
-    validate_database_operation(rc, db, NULL);
+    if(!validate_database_operation(rc, db, NULL)) return;
 
     rc = sqlite3_exec(db,
         "DROP TABLE IF EXISTS users", 0, 0, &error);

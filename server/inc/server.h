@@ -95,25 +95,25 @@ void migration_down(void);
 //CRUD Operations
 int database_create(const char* insert, const char* into, const char* values);
 t_list* database_read(const char* select, const char* from, const char* where);
-void database_update(const char* update, const char* set, const char* where);
-void database_delete(const char* from, const char* where);
+bool database_update(const char* update, const char* set, const char* where);
+bool database_delete(const char* from, const char* where);
 
 //Users CRUD
 int db_user_create(t_user* user);
-void db_user_delete(t_user* user);
-void db_user_delete_by_id(int id);
-void db_user_delete_by_named_field(const char* field, const char* value);
-void db_user_update(t_user* user);
+bool db_user_delete(t_user* user);
+bool db_user_delete_by_id(int id);
+bool db_user_delete_by_named_field(const char* field, const char* value);
+bool db_user_update(t_user* user);
 t_user* db_user_read_by_id(int id);
 t_user* db_user_read_by_login(const char *login);
 t_list* db_user_read_all(void);
 
 //Messages CRUD
 int db_message_create(t_message* message);
-void db_message_delete(t_message* message);
-void db_message_delete_by_id(int id);
-void db_message_delete_by_named_field(const char* field, const char* value);
-void db_message_update(t_message* message);
+bool db_message_delete(t_message* message);
+bool db_message_delete_by_id(int id);
+bool db_message_delete_by_named_field(const char* field, const char* value);
+bool db_message_update(t_message* message);
 t_message* db_message_read_by_id(int id);
 t_list* db_message_read_all(void);
 t_list* db_message_read_by_sender_id(int id);
@@ -121,10 +121,10 @@ t_list* db_message_read_by_group_id(int id);
 
 //Groups CRUD
 int db_group_create(t_group* group);
-void db_group_delete(t_group* group);
-void db_group_delete_by_id(int id);
-void db_group_delete_by_named_field(const char* field, const char* value);
-void db_group_update(t_group* group);
+bool db_group_delete(t_group* group);
+bool db_group_delete_by_id(int id);
+bool db_group_delete_by_named_field(const char* field, const char* value);
+bool db_group_update(t_group* group);
 t_group* db_group_read_by_id(int id);
 t_list* db_group_read_all(void);
 
@@ -132,7 +132,7 @@ t_list* db_group_read_all(void);
 t_list* db_user_read_by_group_id(int id);
 t_list* db_group_read_by_user_id(int id);
 int db_user_add_to_group(int user_id, int group_id);
-void db_user_remove_from_froup(int user_id, int group_id);
+bool db_user_remove_from_froup(int user_id, int group_id);
 
 //Error handling
 void validate_database_operation(int rc, sqlite3* db, char* error);

@@ -5,7 +5,7 @@ void groups_migration_up(void) {
     char* error = NULL;
     int rc = sqlite3_open(exe_path, &db);
 
-    validate_database_operation(rc, db, NULL);
+    if(!validate_database_operation(rc, db, NULL)) return;
 
     rc = sqlite3_exec(db,
         "CREATE TABLE IF NOT EXISTS groups ("
@@ -27,7 +27,7 @@ void groups_migration_down(void) {
     char* error = NULL;
     int rc = sqlite3_open(exe_path, &db);
 
-    validate_database_operation(rc, db, NULL);
+    if(!validate_database_operation(rc, db, NULL)) return;
 
     rc = sqlite3_exec(db,
         "DROP TABLE IF EXISTS groups", 0, 0, &error);

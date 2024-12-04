@@ -56,11 +56,13 @@ int db_user_add_to_group(int user_id, int group_id) {
 	return ret;
 }
 
-void db_user_remove_from_froup(int user_id, int group_id) {
+bool db_user_remove_from_froup(int user_id, int group_id) {
 	char* where = NULL;
 	asprintf(&where, "user_id = %d AND group_id = %d", user_id, group_id);
 
-	database_delete("users_groups", where);
+	bool res = database_delete("users_groups", where);
 
 	mx_strdel(&where);
+
+	return res;
 }

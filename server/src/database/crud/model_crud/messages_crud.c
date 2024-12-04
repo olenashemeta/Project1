@@ -12,46 +12,55 @@ int db_message_create(t_message* message)
 	return ret;
 }
 
-void db_message_delete(t_message* message)
+bool db_message_delete(t_message* message)
 {
 	char* where = NULL;
 	asprintf(&where, "id = %d", message->id);
 
-	database_delete("messages", where);
+	bool res = database_delete("messages", where);
 
 	mx_strdel(&where);
+
+	return res;
 }
 
-void db_message_delete_by_id(int id)
+bool db_message_delete_by_id(int id)
 {
 	char* where = NULL;
 	asprintf(&where, "id = %d", id);
 
-	database_delete("messages", where);
+	bool res = database_delete("messages", where);
 
 	mx_strdel(&where);
+
+	return res;
 }
 
-void db_message_delete_by_named_field(const char* field, const char* value)
+bool db_message_delete_by_named_field(const char* field, const char* value)
 {
 	char* where = NULL;
 	asprintf(&where, "%s = '%s'", field, value);
 
-	database_delete("messages", where);
+	bool res = database_delete("messages", where);
 
 	mx_strdel(&where);
+
+	return res;
 }
 
-void db_message_update(t_message* message)
+bool db_message_update(t_message* message)
 {
 	char* where = NULL;
 	char* set = NULL;
 	asprintf(&where, "id = %d", message->id);
 	asprintf(&set, "sent_by = %d, text = '%s', group_id = %d", message->sent_by, message->text, message->group_id);
-	database_update("messages", set, where);
+	
+	bool res = database_update("messages", set, where);
 
 	mx_strdel(&where);
 	mx_strdel(&set);
+
+	return res;
 }
 
 t_message* db_message_read_by_id(int id) 

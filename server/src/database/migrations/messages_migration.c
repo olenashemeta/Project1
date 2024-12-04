@@ -6,7 +6,7 @@ void messages_migration_up(void) {
     char* command = NULL;
     int rc = sqlite3_open(exe_path, &db);
 
-    validate_database_operation(rc, db, NULL);
+    if(!validate_database_operation(rc, db, NULL)) return;
 
     rc = sqlite3_exec(db,
         "CREATE TABLE IF NOT EXISTS messages ("
@@ -18,6 +18,7 @@ void messages_migration_up(void) {
         "FOREIGN KEY(sent_by) REFERENCES users(id),"
         "FOREIGN KEY(group_id) REFERENCES groups(id))"
         , 0, 0, &error);
+
     validate_database_operation(rc, db, error);
 
     sqlite3_close(db);
@@ -29,7 +30,7 @@ void messages_migration_down(void) {
     char* command = NULL;
     int rc = sqlite3_open(exe_path, &db);
 
-    validate_database_operation(rc, db, NULL);
+    if(!validate_database_operation(rc, db, NULL)) return;
 
     rc = sqlite3_exec(db,
         "DROP TABLE IF EXISTS messages", 0, 0, &error);

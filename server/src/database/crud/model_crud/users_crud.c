@@ -12,47 +12,56 @@ int db_user_create(t_user* user)
 	return ret;
 }
 
-void db_user_delete(t_user* user) 
+bool db_user_delete(t_user* user) 
 {
 	char* where;
 	if (user->id > 0)asprintf(&where, "id = %d", user->id);
 	else asprintf(&where, "login = '%s'", user->login);
 
-	database_delete("users", where);
+	bool res = database_delete("users", where);
 
 	mx_strdel(&where);
+
+	return res;
 }
 
-void db_user_delete_by_id(int id) 
+bool db_user_delete_by_id(int id) 
 {
 	char* where = NULL;
 	asprintf(&where, "id = %d", id);
 
-	database_delete("users", where);
+	bool res = database_delete("users", where);
 
 	mx_strdel(&where);
+
+	retrun res;
 }
 
-void db_user_delete_by_named_field(const char *field, const char *value)
+bool db_user_delete_by_named_field(const char *field, const char *value)
 {
 	char* where = NULL;
 	asprintf(&where, "%s = '%s'", field, value);
 
-	database_delete("users", where);
+	bool res = database_delete("users", where);
 
 	mx_strdel(&where);
+
+	return res;
 }
 
-void db_user_update(t_user* user) 
+bool db_user_update(t_user* user) 
 {
 	char* where = NULL;
 	char* set = NULL;
 	asprintf(&where, "id = %d", user->id);
 	asprintf(&set, "username = '%s', login = '%s', password = '%s', logo_id = %d", user->username, user->login, user->password, user->logo_id);
-	database_update("users", set, where);
+	
+	bool res = database_update("users", set, where);
 	
 	mx_strdel(&where);
 	mx_strdel(&set);
+
+	return res;
 }
 
 t_user* db_user_read_by_id(int id) {
