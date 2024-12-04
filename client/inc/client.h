@@ -47,9 +47,8 @@ typedef struct s_main {
 	t_keys keys;
 
 	bool status;
-	//cJSON *server_response;
-	//bool has_new_data;
-
+	cJSON *server_response;
+	bool has_new_data;
 
 }				t_main;
 
@@ -64,7 +63,7 @@ int mx_connect_to_server(t_main *main);
 int mx_receiving_pubkey(t_main *main);
 int mx_transfer_aes_key(t_main *main);
 int handshake(t_main *main);
-void process_response(t_packet *recieved_data);
+void process_response(t_main *main_data);
 
 //security func
 int generate_aes_key_iv(t_main *main);

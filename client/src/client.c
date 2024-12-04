@@ -40,7 +40,6 @@ static void *connection(void *arg) {
 
         printf("Handshake succeeded. AES session established.\n");
 
-        t_packet *received_data = NULL;
         while (true) {
             pthread_mutex_lock(&main->lock);
             bool local_is_closing = main->is_closing;
@@ -50,7 +49,7 @@ static void *connection(void *arg) {
                 break;
             }
 
-            received_data = receive_message(main->socket);
+            t_packet *received_data = receive_message(main->socket);
             if (!received_data) {
                 break;
             }
@@ -60,9 +59,22 @@ static void *connection(void *arg) {
                 free_message(received_data);
                 break;
             }
-
-            process_response(received_data);
+            cJSON *json_payload = cJSON_ParseWithLength(received_data->data, received_data->len);
             free_message(received_data);
+
+            if (!json_payload) {
+                fprintf(stderr, "Failed to parse JSON\n");
+                break;
+            }
+
+            pthread_mutex_lock(&main->lock);
+            //if (main->server_response) {
+            //    cJSON_Delete(main->server_response);
+            //}
+            main->server_response = json_payload;
+            main->has_new_data = true;
+            pthread_cond_signal(&main->cond);
+            pthread_mutex_unlock(&main->lock);
         }
 
         close(main->socket);

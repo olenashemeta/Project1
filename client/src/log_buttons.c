@@ -89,17 +89,37 @@ void on_login_button_clicked(GtkWidget *button, gpointer data) {
         gtk_label_set_text(GTK_LABEL(error_label), "Fill in all fields");
         return;
     }
-    
+
     t_user* user = mx_create_log_user(login, password);
 
     g_print("Login: %s\n", user->login);
     g_print("Password: %s\n", user->password);
-    
+
     cJSON *login_request = form_login_request(user->login, user->password);
+    mx_free_user(user);
 
     prepare_and_send_json(login_request, main_data);
 
-    mx_free_user(user);
+    pthread_mutex_lock(&main_data->lock);
+    while (!main_data->has_new_data) {
+        pthread_cond_wait(&main_data->cond, &main_data->lock);
+    }
+
+    if (main_data->server_response) {
+        process_response(main_data);
+        cJSON_Delete(main_data->server_response);
+        main_data->server_response = NULL;
+    }
+    main_data->has_new_data = false;
+    pthread_mutex_unlock(&main_data->lock);
+
+    if (main_data->status) {
+        g_print("true\n");
+        main_data->status = false;
+    } else {
+        g_print("false\n");
+    }
+
 }
 
 void on_submit_account_button_clicked(GtkWidget *button, gpointer data) {
