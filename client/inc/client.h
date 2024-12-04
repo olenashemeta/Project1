@@ -3,6 +3,7 @@
 
 #include "../../libs/libmx/inc/libmx.h"
 #include "../../libs/JsonLib/cJSON.h"
+#include "../inc/bee_user.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,6 +31,7 @@ typedef struct s_keys {
 
 typedef struct s_packet {
 	size_t len;
+	bool status;
 	char *data;
 }			   t_packet;
 
@@ -40,6 +42,7 @@ typedef struct s_main {
 	int port;
 	bool is_connected;
 	bool is_closing;
+	bool status;
 	//cJSON *server_response;
 	pthread_mutex_t lock;
 	pthread_cond_t cond;
@@ -108,6 +111,9 @@ void on_create_account_button_clicked(GtkWidget *button, gpointer data);
 void on_login_button_clicked(GtkWidget *button, gpointer data);
 void on_submit_account_button_clicked(GtkWidget *button, gpointer data);
 void restore_login_form(GtkWidget *button, gpointer data);
+
+//response handler funcs
+void handle_login_response(cJSON *json_payload);
 
 //test func
 t_user *mx_create_client(void);
