@@ -88,7 +88,7 @@ void handle_register_request(cJSON *json_payload, t_client *client) {
     cJSON_AddStringToObject(json, "response_type", "register");
 
     t_user* user = user_create(username, user_login, user_password, 1);
-    int user_id = db_user_create(t_user* user);
+    int user_id = db_user_create(user);
   
     if(user_id < 0) {
         cJSON_AddBoolToObject(json, "status", false);
