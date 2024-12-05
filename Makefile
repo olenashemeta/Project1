@@ -1,7 +1,10 @@
 CC = clang
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -D_GNU_SOURCE \
-         `pkg-config --cflags gtk+-3.0` -pthread
-LDFLAGS = `pkg-config --libs gtk+-3.0` -lssl -lcrypto
+         `pkg-config --cflags gtk+-3.0` -pthread \
+         -I/usr/include/librsvg-2.0
+
+LDFLAGS = `pkg-config --libs gtk+-3.0` -lssl -lcrypto `pkg-config --libs librsvg-2.0`
+
 
 SRC_DIR = src
 OBJ_DIR = obj

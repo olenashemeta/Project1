@@ -13,6 +13,7 @@
 #include <time.h>
 #include <glib.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
+#include <librsvg/rsvg.h>
 
 void mx_connect_to_server(GtkLabel *label);
 void css_theme_to_window(GtkWidget *window, const char* theme);
