@@ -86,10 +86,10 @@ void handle_register_request(cJSON *json_payload, t_client *client) {
         return;
     }
 
-    size_t decoded_len;
-    unsigned char *decoded_login = base64_decode(login_item->valuestring, &decoded_len);
-    unsigned char *decoded_username = base64_decode(username_item->valuestring, &decoded_len);
-    unsigned char *decoded_password = base64_decode(password_item->valuestring, &decoded_len);
+    size_t decoded_login_len, decoded_username_len, decoded_password_len;
+    unsigned char *decoded_login = base64_decode(login_item->valuestring, &decoded_login_len);
+    unsigned char *decoded_username = base64_decode(username_item->valuestring, &decoded_username_len);
+    unsigned char *decoded_password = base64_decode(password_item->valuestring, &decoded_password_len);
 
     if (!decoded_login || !decoded_username || !decoded_password) {
         syslog(LOG_ERR, "Failed to decode Base64 fields in register request");
@@ -99,6 +99,10 @@ void handle_register_request(cJSON *json_payload, t_client *client) {
         return;
     }
 
+    char *username = malloc(decoded_username_len + 1);
+    memcpy(username, decoded_username, decoded_username_len);
+    username[decoded_username_len] = '\0';
+
     char user_login[SHA256_DIGEST_LENGTH * 2 + 1];
     char user_password[SHA256_DIGEST_LENGTH * 2 + 1];
     for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
@@ -107,8 +111,6 @@ void handle_register_request(cJSON *json_payload, t_client *client) {
     }
     user_login[SHA256_DIGEST_LENGTH * 2] = '\0';
     user_password[SHA256_DIGEST_LENGTH * 2] = '\0';
-
-    const char *username = (const char *)decoded_username;
 
     cJSON *json = cJSON_CreateObject();
     cJSON_AddStringToObject(json, "response_type", "register");
