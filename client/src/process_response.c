@@ -18,6 +18,9 @@ void process_response(t_packet *recieved_data) {
     if (strcmp(response_type->valuestring, "login") == 0) {
         printf("A 'login' type response was received\n");
         handle_login_response(json_payload);
+    } else if (strcmp (response_type->valuestring, "register") == 0) {
+        printf("A 'register' type response was received\n");
+        handle_register_response(json_payload);
     }
 
     cJSON_Delete(json_payload);

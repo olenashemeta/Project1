@@ -120,6 +120,7 @@ void restore_login_form(GtkWidget *button, gpointer data);
 
 //response handler funcs
 void handle_login_response(cJSON *json_payload);
+void handle_register_response(cJSON *json_payload);
 
 //test func
 t_user *mx_create_client(void);

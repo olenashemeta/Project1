@@ -3,27 +3,33 @@
 gboolean gtk_update_notification_label(gpointer user_data) {
     int status = GPOINTER_TO_INT(user_data);
 
-    if (status != 1) {
-        GtkWidget *login_window = g_object_get_data(G_OBJECT(main_data->buff), "login-window");
-        if (!login_window) {
-            fprintf(stderr, "Login window not found\n");
-            return G_SOURCE_REMOVE;
-        }
-
-        GtkWidget *notification_label = g_object_get_data(G_OBJECT(main_data->buff), "error-label");
-        if (!notification_label) {
-            fprintf(stderr, "Notification label not found\n");
-            return G_SOURCE_REMOVE;
-        }
-
-        const gchar *error_message = "Login failed.";
-        gtk_label_set_text(GTK_LABEL(notification_label), error_message);
-
-        GtkStyleContext *context = gtk_widget_get_style_context(notification_label);
-        gtk_style_context_add_class(context, "error-label");
-
-        gtk_widget_show(notification_label);
+    GtkWidget *login_window = g_object_get_data(G_OBJECT(main_data->buff), "login-window");
+    if (!login_window) {
+        fprintf(stderr, "Login window not found\n");
+        return G_SOURCE_REMOVE;
     }
+
+    GtkWidget *notification_label = g_object_get_data(G_OBJECT(main_data->buff), "error-label");
+    if (!notification_label) {
+        fprintf(stderr, "Notification label not found\n");
+        return G_SOURCE_REMOVE;
+    }
+
+    const gchar *message = NULL;
+    GtkStyleContext *context = gtk_widget_get_style_context(notification_label);
+
+    if (status == 1) {
+        //message = "Operation successful";
+        //gtk_style_context_remove_class(context, "error-label");
+        //gtk_style_context_add_class(context, "success-label");
+    } else {
+        message = "An error occurred";
+        gtk_style_context_remove_class(context, "success-label");
+        gtk_style_context_add_class(context, "error-label");
+    }
+
+    gtk_label_set_text(GTK_LABEL(notification_label), message);
+    gtk_widget_show(notification_label);
 
     return G_SOURCE_REMOVE;
 }
@@ -115,14 +121,27 @@ void handle_login_response(cJSON *json_payload) {
     }
 }
 
-void handle_register_respone(cJSON *json_payload) {
+void handle_register_response(cJSON *json_payload) {
     cJSON *status = cJSON_GetObjectItemCaseSensitive(json_payload, "status");
-        if (!cJSON_IsBool(status)) {
+    if (!cJSON_IsBool(status)) {
         fprintf(stderr, "Missing or invalid 'status' in JSON data\n");
+        g_idle_add(gtk_update_notification_label, GINT_TO_POINTER(0));
         return;
     }
 
-    if (status->valueint) {
+    int register_status = status->valueint ? 1 : 0;
 
+    if (register_status) {
+        printf("Registration was successful\n");
+        g_idle_add(gtk_update_notification_label, GINT_TO_POINTER(1));
+    } else {
+        printf("Registration failed\n");
+
+        cJSON *error_message = cJSON_GetObjectItemCaseSensitive(json_payload, "data");
+        if (cJSON_IsString(error_message)) {
+            printf("Error: %s\n", error_message->valuestring);
+        }
+
+        g_idle_add(gtk_update_notification_label, GINT_TO_POINTER(0));
     }
 }

@@ -53,6 +53,7 @@ void on_create_account_button_clicked(GtkWidget *button, gpointer data) {
     gtk_widget_set_name(error_label, "error-label");
     GtkStyleContext *context = gtk_widget_get_style_context(error_label);
     gtk_style_context_add_class(context, "error-label");
+    g_object_set_data(G_OBJECT(main_data->buff), "error-label", error_label);
     
     GtkWidget *submit_create_account_button = gtk_button_new_with_label("Submit Account");
     gtk_widget_set_name(submit_create_account_button, "submit_create_account_button");
