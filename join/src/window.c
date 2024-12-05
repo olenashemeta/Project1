@@ -13,6 +13,49 @@ void add_message_to_chat(const char *message, const char *file_path);
 void on_chat_closed(GtkButton *button, gpointer user_data);
 void add_chat_item(GtkButton *button, const char *chat_name);
 
+void set_window_background_from_svg(GtkWidget *overlay, const char *svg_path, int width, int height) {
+    if (!g_file_test(svg_path, G_FILE_TEST_EXISTS)) {
+        g_printerr("SVG file does not exist: %s\n", svg_path);
+        return;
+    }
+
+    GError *error = NULL;
+    RsvgHandle *svg_handle = rsvg_handle_new_from_file(svg_path, &error);
+    if (!svg_handle) {
+        g_printerr("Failed to load SVG file: %s\nError: %s\n", svg_path, error->message);
+        g_error_free(error);
+        return;
+    }
+
+    RsvgDimensionData dimensions;
+    rsvg_handle_get_dimensions(svg_handle, &dimensions);
+
+    double svg_width = dimensions.width;
+    double svg_height = dimensions.height;
+
+    cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
+    cairo_t *cr = cairo_create(surface);
+
+    cairo_scale(cr, (double)width / svg_width, (double)height / svg_height);
+
+    if (!rsvg_handle_render_cairo(svg_handle, cr)) {
+        g_printerr("Failed to render SVG\n");
+        cairo_destroy(cr);
+        cairo_surface_destroy(surface);
+        g_object_unref(svg_handle);
+        return;
+    }
+
+    cairo_destroy(cr);
+    g_object_unref(svg_handle);
+
+    GtkWidget *background = gtk_image_new_from_surface(surface);
+    cairo_surface_destroy(surface);
+
+    gtk_overlay_add_overlay(GTK_OVERLAY(overlay), background);
+    gtk_overlay_set_overlay_pass_through(GTK_OVERLAY(overlay), background, TRUE);
+    gtk_widget_show(background);
+}
 
 void on_avatar_selected(GtkButton *button, gpointer user_data) {
     (void)button;
@@ -146,32 +189,34 @@ void show_chat_window(GtkApplication *app) {
 
     window = gtk_application_window_new(app);
     gtk_window_set_title(GTK_WINDOW(window), "Bee Chat");
-    gtk_window_set_default_size(GTK_WINDOW(window), 1280, 720); 
+    gtk_window_set_default_size(GTK_WINDOW(window), 1280, 800); 
     gtk_window_set_resizable(GTK_WINDOW(window), FALSE);  
 
-    // Завантажуємо CSS стилі
+    // Загружаем CSS стили
     GtkCssProvider *css_provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_path(css_provider, "css/stylea.css", NULL);
+    gtk_css_provider_load_from_path(css_provider, "css/style.css", NULL);
     gtk_style_context_add_provider_for_screen(
-        gdk_screen_get_default(),
+        gtk_widget_get_screen(window),
         GTK_STYLE_PROVIDER(css_provider),
         GTK_STYLE_PROVIDER_PRIORITY_USER
     );
 
-    // Додаємо overlay для вікна
     overlay = gtk_overlay_new();
     gtk_container_add(GTK_CONTAINER(window), overlay);
 
-    // Створення панелі для лівої та правої частини
-    paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
-    gtk_container_add(GTK_CONTAINER(overlay), paned);
+    set_window_background_from_svg(overlay, "img/background.svg", 1920, 1080);
 
-    // Ліва панель
+    // Создаем панель для левой и правой части
+    paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_overlay_add_overlay(GTK_OVERLAY(overlay), paned);
+
+    // Левая панель
     rect_left = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     gtk_widget_set_name(rect_left, "rect-left");
     gtk_widget_set_size_request(rect_left, 200, 100);
 
-    GtkWidget *image = gtk_image_new_from_file("img/bee.png");
+    GtkWidget *image = gtk_image_new_from_file("img/bee1.png");
+    avatar_image_global = GTK_IMAGE(image);
     gtk_box_pack_start(GTK_BOX(rect_left), image, FALSE, FALSE, 0);
 
     GtkWidget *title_label = gtk_label_new(username);
@@ -179,11 +224,12 @@ void show_chat_window(GtkApplication *app) {
     gtk_label_set_xalign(GTK_LABEL(title_label), 0.5);
     gtk_box_pack_start(GTK_BOX(rect_left), title_label, FALSE, FALSE, 5);
 
-
     GtkWidget *search_entry = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(search_entry), "Search chat...");
     gtk_widget_set_name(search_entry, "search-entry");
     gtk_box_pack_start(GTK_BOX(rect_left), search_entry, FALSE, FALSE, 5);
+
+    // Подключаем функцию для поиска
     g_signal_connect(search_entry, "changed", G_CALLBACK(on_search_changed), NULL);
 
     GtkWidget *scrollable_chat_list = gtk_scrolled_window_new(NULL, NULL);
@@ -194,6 +240,8 @@ void show_chat_window(GtkApplication *app) {
 
     chat_list = gtk_list_box_new();
     gtk_widget_set_name(chat_list, "chat-list-box");
+
+    // Подключаем функцию для выбора чата
     g_signal_connect(chat_list, "row-selected", G_CALLBACK(on_chat_selected), NULL);
 
     gtk_container_add(GTK_CONTAINER(scrollable_chat_list), chat_list);
@@ -201,12 +249,15 @@ void show_chat_window(GtkApplication *app) {
 
     GtkWidget *create_chat_button = gtk_button_new_with_label("+ Create new chat");
     gtk_widget_set_name(create_chat_button, "create-chat-button");
+
+    // Подключаем функцию для создания чата
     g_signal_connect(create_chat_button, "clicked", G_CALLBACK(on_create_chat_clicked), NULL);
+
     gtk_box_pack_end(GTK_BOX(rect_left), create_chat_button, FALSE, FALSE, 5);
 
     gtk_paned_add1(GTK_PANED(paned), rect_left);
 
-    // Права панель
+    // Правая панель
     rect_right = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
 
     GtkWidget *scrollable_message_area = gtk_scrolled_window_new(NULL, NULL);
@@ -223,6 +274,8 @@ void show_chat_window(GtkApplication *app) {
 
     GtkWidget *file_button = gtk_button_new_with_label("📁");
     gtk_box_pack_start(GTK_BOX(entry_box), file_button, FALSE, FALSE, 5);
+
+    // Подключаем функцию для выбора файла
     g_signal_connect(file_button, "clicked", G_CALLBACK(on_file_button_clicked), window);
 
     GtkWidget *message_entry = gtk_entry_new();
@@ -233,10 +286,12 @@ void show_chat_window(GtkApplication *app) {
 
     gtk_box_pack_end(GTK_BOX(rect_right), entry_box, FALSE, FALSE, 5);
 
+    // Подключаем функцию для отправки сообщений
     g_signal_connect(send_button, "clicked", G_CALLBACK(add_message), message_entry);
 
     gtk_paned_add2(GTK_PANED(paned), rect_right);
 
+    // Настройки
     fixed = gtk_fixed_new();
     gtk_overlay_add_overlay(GTK_OVERLAY(overlay), fixed);
 
@@ -246,10 +301,9 @@ void show_chat_window(GtkApplication *app) {
     gtk_widget_set_name(settings_button, "settings_button");
     gtk_fixed_put(GTK_FIXED(fixed), settings_button, 5, 20);
 
+    // Подключаем функцию для кнопки настроек
     g_signal_connect(settings_button, "clicked", G_CALLBACK(on_settings_clicked), NULL);
 
     gtk_widget_show_all(window);
 }
-
-
 
