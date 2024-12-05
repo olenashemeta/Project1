@@ -113,23 +113,32 @@ void handle_register_request(cJSON *json_payload, t_client *client) {
     cJSON *json = cJSON_CreateObject();
     cJSON_AddStringToObject(json, "response_type", "register");
 
-    t_user *user = user_create(username, user_login, user_password, 1);
-    int user_id = db_user_create(user);
+    t_user *existing = db_user_read_by_login(user_login);
 
-    if (user_id < 0) {
+    if(existing) {
+        free_user(&existing);
         cJSON_AddBoolToObject(json, "status", false);
-        cJSON_AddStringToObject(json, "data", "Could not record user data.");
-    } else {
-        cJSON *json_user = user_to_json(user);
-        if (!json_user) {
+        cJSON_AddStringToObject(json, "data", "User already exists.");
+    }
+    else {
+         t_user *user = user_create(username, user_login, user_password, 1);
+         int user_id = db_user_create(user);
+
+        if (user_id < 0) {
             cJSON_AddBoolToObject(json, "status", false);
-            cJSON_AddStringToObject(json, "data", "Server error.");
+            cJSON_AddStringToObject(json, "data", "Could not record user data.");
         } else {
-            client->id_db = user_id;
-            cJSON_AddBoolToObject(json, "status", true);
-            cJSON_AddItemToObject(json, "data", json_user);
+            cJSON *json_user = user_to_json(user);
+            if (!json_user) {
+                cJSON_AddBoolToObject(json, "status", false);
+                cJSON_AddStringToObject(json, "data", "Server error.");
+            } else {
+                client->id_db = user_id;
+                cJSON_AddBoolToObject(json, "status", true);
+                cJSON_AddItemToObject(json, "data", json_user);
+            }
+            free_user(&user);
         }
-        free_user(&user);
     }
 
     prepare_and_send_json(json, client);
