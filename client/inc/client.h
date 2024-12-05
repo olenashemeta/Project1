@@ -46,9 +46,11 @@ typedef struct s_main {
 	pthread_cond_t cond;
 	t_keys keys;
 
-	bool status;
-	cJSON *server_response;
-	bool has_new_data;
+	GtkTextBuffer *buff;
+
+//	bool status;
+//	cJSON *server_response;
+//	bool has_new_data;
 
 }				t_main;
 
@@ -58,12 +60,15 @@ typedef struct s_user {
     char* password;
 } t_user;
 
+
+extern t_main *main_data;
+
 //func to communicate with the server
 int mx_connect_to_server(t_main *main);
 int mx_receiving_pubkey(t_main *main);
 int mx_transfer_aes_key(t_main *main);
 int handshake(t_main *main);
-void process_response(t_main *main_data);
+void process_response(t_packet *recieved_data);
 
 //security func
 int generate_aes_key_iv(t_main *main);
@@ -121,5 +126,9 @@ t_user *mx_create_client(void);
 void mx_print_client(const t_user *client);
 void mx_free_client(t_user *client);
 void test_base64_encoding(t_main *main_data);
+
+void update_error_label(GtkWidget *error_label, const char *message);
+gboolean gtk_update_notification_label(gpointer user_data);
+gboolean gtk_destroy_login_window(gpointer data);
 
 #endif

@@ -1,5 +1,15 @@
 #include "../inc/client.h"
 
+void update_error_label(GtkWidget *error_label, const char *message) {
+    if (message) {
+        gtk_label_set_text(GTK_LABEL(error_label), message);
+        gtk_widget_show(error_label);
+    } else {
+        gtk_label_set_text(GTK_LABEL(error_label), "");
+        gtk_widget_hide(error_label);
+    }
+}
+
 void on_create_account_button_clicked(GtkWidget *button, gpointer data) {
     t_main *main_data = (t_main *)g_object_get_data(G_OBJECT(button), "main_data");
 
@@ -40,8 +50,10 @@ void on_create_account_button_clicked(GtkWidget *button, gpointer data) {
     gtk_entry_set_max_length(GTK_ENTRY(confirm_password_entry), 100); 
 
     GtkWidget *error_label = gtk_label_new("");
-    gtk_widget_set_name(error_label, "error_label");
-
+    gtk_widget_set_name(error_label, "error-label");
+    GtkStyleContext *context = gtk_widget_get_style_context(error_label);
+    gtk_style_context_add_class(context, "error-label");
+    
     GtkWidget *submit_create_account_button = gtk_button_new_with_label("Submit Account");
     gtk_widget_set_name(submit_create_account_button, "submit_create_account_button");
     GtkWidget *back_to_login_button = gtk_button_new_with_label("Back to Log In");
@@ -86,7 +98,7 @@ void on_login_button_clicked(GtkWidget *button, gpointer data) {
     const char *password = gtk_entry_get_text(GTK_ENTRY(password_entry));
 
     if (mx_strcmp(password, "") == 0 || mx_strcmp(login, "") == 0) {
-        gtk_label_set_text(GTK_LABEL(error_label), "Fill in all fields");
+        update_error_label(error_label, "Fill in all fields");
         return;
     }
 
@@ -94,32 +106,13 @@ void on_login_button_clicked(GtkWidget *button, gpointer data) {
 
     g_print("Login: %s\n", user->login);
     g_print("Password: %s\n", user->password);
-
+    
     cJSON *login_request = form_login_request(user->login, user->password);
-    mx_free_user(user);
 
     prepare_and_send_json(login_request, main_data);
 
-    pthread_mutex_lock(&main_data->lock);
-    while (!main_data->has_new_data) {
-        pthread_cond_wait(&main_data->cond, &main_data->lock);
-    }
-
-    if (main_data->server_response) {
-        process_response(main_data);
-        cJSON_Delete(main_data->server_response);
-        main_data->server_response = NULL;
-    }
-    main_data->has_new_data = false;
-    pthread_mutex_unlock(&main_data->lock);
-
-    if (main_data->status) {
-        g_print("true\n");
-        main_data->status = false;
-    } else {
-        g_print("false\n");
-    }
-
+    mx_free_user(user);
+    update_error_label(error_label, NULL);
 }
 
 void on_submit_account_button_clicked(GtkWidget *button, gpointer data) {
@@ -137,7 +130,6 @@ void on_submit_account_button_clicked(GtkWidget *button, gpointer data) {
     GtkWidget *password_entry = GTK_WIDGET(g_object_get_data(G_OBJECT(button), "password_entry"));
     GtkWidget *confirm_password_entry = GTK_WIDGET(g_object_get_data(G_OBJECT(button), "confirm_password_entry"));
     GtkWidget *error_label = GTK_WIDGET(g_object_get_data(G_OBJECT(button), "error_label"));
-    gtk_widget_set_name(error_label, "error-label");
     
     const char *username = gtk_entry_get_text(GTK_ENTRY(username_entry));
     const char *login = gtk_entry_get_text(GTK_ENTRY(login_entry));
@@ -145,22 +137,18 @@ void on_submit_account_button_clicked(GtkWidget *button, gpointer data) {
     const char *confirm_password = gtk_entry_get_text(GTK_ENTRY(confirm_password_entry));
 
     if (mx_strcmp(username, "") == 0 || mx_strcmp(password, "") == 0 || mx_strcmp(login, "") == 0) {
-        gtk_label_set_text(GTK_LABEL(error_label), "Fill in all fields");
+        update_error_label(error_label, "Fill in all fields");
         return;
     }
 
     if (mx_strlen(password) < 8) {
-        gtk_label_set_text(GTK_LABEL(error_label), "Password must be\nlonger than 8 characters");
+        update_error_label(error_label, "Password must be\nlonger than 8 characters");
         return;
-    } else {
-        gtk_label_set_text(GTK_LABEL(error_label), ""); 
     }
     
     if (mx_strcmp(password, confirm_password) != 0) {
-        gtk_label_set_text(GTK_LABEL(error_label), "Passwords don't match!");
+        update_error_label(error_label, "Passwords don't match!");
         return;
-    } else {
-        gtk_label_set_text(GTK_LABEL(error_label), ""); 
     }
 
     t_user* user = mx_create_user(login, username, password);
@@ -170,9 +158,10 @@ void on_submit_account_button_clicked(GtkWidget *button, gpointer data) {
     g_print("Login: %s\n", user->login);
     g_print("Password: %s\n", user->password);
 
-    cJSON *register_requset = form_register_request(user->login, user->name, user->password);
+    cJSON *register_request = form_register_request(user->login, user->name, user->password);
 
-    prepare_and_send_json(register_requset, main_data);
+    prepare_and_send_json(register_request, main_data);
 
     mx_free_user(user);
+    update_error_label(error_label, NULL);
 }

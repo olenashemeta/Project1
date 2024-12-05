@@ -29,12 +29,14 @@ void restore_login_form(GtkWidget *button, gpointer data) {
 
     GtkWidget *error_label = gtk_label_new("");
     gtk_widget_set_name(error_label, "error-label");
+    
 
     gtk_box_pack_start(GTK_BOX(vbox), username_entry, FALSE, FALSE, 5);
     gtk_box_pack_start(GTK_BOX(vbox), password_entry, FALSE, FALSE, 5);
     gtk_box_pack_start(GTK_BOX(vbox), error_label, FALSE, FALSE, 5);
 
-
+    g_object_set_data(G_OBJECT(main_data->buff), "error-label", error_label);
+    
     GtkWidget *login_button = gtk_button_new_with_label("Enter hive");
     gtk_widget_set_name(login_button, "login_button");
     gtk_box_pack_start(GTK_BOX(vbox), login_button, FALSE, FALSE, 5);

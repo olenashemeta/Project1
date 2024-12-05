@@ -9,7 +9,7 @@ void login_window(GtkApplication *app, gpointer user_data) {
     t_main *main_data = (t_main *)user_data;
 
     window = gtk_application_window_new(app);
-    gtk_window_set_title(GTK_WINDOW(window), "CHAT");
+    gtk_window_set_title(GTK_WINDOW(window), "Bee chat");
     gtk_window_set_default_size(GTK_WINDOW(window), 900, 700);
     gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
     gtk_widget_set_name(window, "main-window");
@@ -46,6 +46,7 @@ void login_window(GtkApplication *app, gpointer user_data) {
     error_label = gtk_label_new("");
     gtk_widget_set_name(error_label, "error-label");
     gtk_box_pack_start(GTK_BOX(vbox), error_label, FALSE, FALSE, 5);
+    g_object_set_data(G_OBJECT(main_data->buff), "error-label", error_label);
 
     login_button = gtk_button_new_with_label("Log In");
     gtk_widget_set_name(login_button, "login_button");
@@ -56,6 +57,7 @@ void login_window(GtkApplication *app, gpointer user_data) {
     g_object_set_data(G_OBJECT(login_button), "error_label", error_label);
 
     gtk_box_pack_start(GTK_BOX(vbox), login_button, FALSE, FALSE, 5);
+    g_object_set_data(G_OBJECT(main_data->buff), "login-window", window);
     g_signal_connect(login_button, "clicked", G_CALLBACK(on_login_button_clicked), NULL);
 
     create_account_button = gtk_button_new_with_label("Become Member");

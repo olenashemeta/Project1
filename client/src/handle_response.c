@@ -1,5 +1,42 @@
 #include "../inc/client.h"
 
+gboolean gtk_update_notification_label(gpointer user_data) {
+    int status = GPOINTER_TO_INT(user_data);
+
+    if (status != 1) {
+        GtkWidget *login_window = g_object_get_data(G_OBJECT(main_data->buff), "login-window");
+        if (!login_window) {
+            fprintf(stderr, "Login window not found\n");
+            return G_SOURCE_REMOVE;
+        }
+
+        GtkWidget *notification_label = g_object_get_data(G_OBJECT(main_data->buff), "error-label");
+        if (!notification_label) {
+            fprintf(stderr, "Notification label not found\n");
+            return G_SOURCE_REMOVE;
+        }
+
+        const gchar *error_message = "Login failed.";
+        gtk_label_set_text(GTK_LABEL(notification_label), error_message);
+
+        GtkStyleContext *context = gtk_widget_get_style_context(notification_label);
+        gtk_style_context_add_class(context, "error-label");
+
+        gtk_widget_show(notification_label);
+    }
+
+    return G_SOURCE_REMOVE;
+}
+
+gboolean gtk_destroy_login_window(gpointer data) {
+    (void)data;
+    GtkWidget *login_window = g_object_get_data(G_OBJECT(main_data->buff), "login-window");
+    if (login_window) {
+        gtk_widget_destroy(login_window);
+    }
+    return G_SOURCE_REMOVE;
+}
+
 void handle_login_response(cJSON *json_payload) {
     cJSON *status = cJSON_GetObjectItemCaseSensitive(json_payload, "status");
     if (!cJSON_IsBool(status)) {
@@ -7,7 +44,9 @@ void handle_login_response(cJSON *json_payload) {
         return;
     }
 
-    if (status->valueint) {
+    int login_status = status->valueint ? 1 : 0;
+
+    if (login_status) {
         printf("Login was successful\n");
 
         cJSON *data = cJSON_GetObjectItemCaseSensitive(json_payload, "data");
@@ -58,6 +97,8 @@ void handle_login_response(cJSON *json_payload) {
         printf("User login: %s, username: %s, created at: %s, logo_id: %d\n",
                user.login, user.username, user.created_at, user.logo_id);
 
+        g_idle_add(gtk_destroy_login_window, NULL);
+
         free(user.login);
         free(user.username);
         free(user.created_at);
@@ -69,6 +110,8 @@ void handle_login_response(cJSON *json_payload) {
         if (cJSON_IsString(error_message)) {
             printf("Error: %s\n", error_message->valuestring);
         }
+
+        g_idle_add(gtk_update_notification_label, GINT_TO_POINTER(0));
     }
 }
 

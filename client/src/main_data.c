@@ -23,6 +23,8 @@ t_main *mx_create_main_data(const char *address, int port) {
 
     main->keys.pkey = NULL;
 
+    main->buff = gtk_text_buffer_new(NULL);
+    
     if (pthread_mutex_init(&main->lock, NULL) != 0) {
         perror("Mutex init failed");
         free(main->address);

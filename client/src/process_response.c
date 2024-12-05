@@ -1,19 +1,17 @@
 #include "../inc/client.h"
 
-void process_response(t_main *main_data) {
-    if (!main_data || !main_data->server_response) {
-        fprintf(stderr, "Error: Invalid main_data or server_response in process_response\n");
+void process_response(t_packet *recieved_data) {
+    if (!recieved_data || !recieved_data->data) {
+        fprintf(stderr, "Invalid t_receive structure in process_request\n");
         return;
     }
-
-    cJSON *json_payload = main_data->server_response;
-    cJSON *response_type = cJSON_GetObjectItemCaseSensitive(json_payload, "response_type");
-
-    cJSON *status = cJSON_GetObjectItemCaseSensitive(json_payload, "status");
-    main_data->status = cJSON_IsTrue(status);
     
+    cJSON *json_payload = cJSON_ParseWithLength(recieved_data->data, recieved_data->len);
+
+    cJSON *response_type = cJSON_GetObjectItemCaseSensitive(json_payload, "response_type");
     if (!cJSON_IsString(response_type) || !response_type->valuestring) {
-        fprintf(stderr, "Missing or invalid 'response_type' in JSON data\n");
+        fprintf(stderr, "Missing or invalid 'request_type' in JSON data\n");
+        cJSON_Delete(json_payload);
         return;
     }
 
@@ -21,5 +19,7 @@ void process_response(t_main *main_data) {
         printf("A 'login' type response was received\n");
         handle_login_response(json_payload);
     }
+
+    cJSON_Delete(json_payload);
 }
 
