@@ -13,6 +13,10 @@ void add_message_to_chat(const char *message, const char *file_path);
 void on_chat_closed(GtkButton *button, gpointer user_data);
 void add_chat_item(GtkButton *button, const char *chat_name);
 
+char* write_username(){
+    return username;
+}
+
 void set_window_background_from_svg(GtkWidget *overlay, const char *svg_path, int width, int height) {
     if (!g_file_test(svg_path, G_FILE_TEST_EXISTS)) {
         g_printerr("SVG file does not exist: %s\n", svg_path);

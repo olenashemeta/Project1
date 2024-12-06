@@ -15,6 +15,14 @@
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <librsvg/rsvg.h>
 
+typedef struct s_group {
+    char* name;
+    int is_private; // 0-false, 1-true
+    //int created_by;
+    char* creator_username;
+    char* sender;
+} t_group;
+
 void mx_connect_to_server(GtkLabel *label);
 void css_theme_to_window(GtkWidget *window, const char* theme);
 void css_theme(const char* theme);
@@ -35,5 +43,10 @@ extern void on_search_changed(GtkEntry *entry, gpointer user_data);
 extern GtkWidget *chat_list;
 extern GtkWidget *message_area;
 extern GtkWidget *current_chat;
+
+// group
+t_group* create_group(const char* name, int is_private, const char* creator_username);
+void free_group(t_group* group);
+char* write_username();
 
 #endif
