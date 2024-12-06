@@ -68,7 +68,7 @@ static int handle_command_line(GApplication *app, GApplicationCommandLine *comma
     const char *port_str = argv[2];
     int port = atoi(port_str);
 
-    main_data = mx_create_main_data(ip, port);
+    main_data = mx_create_main_data(GTK_APPLICATION(app), ip, port);
     if (!main_data) {
         fprintf(stderr, "Failed to initialize main data\n");
         g_strfreev(argv);
@@ -82,6 +82,7 @@ static int handle_command_line(GApplication *app, GApplicationCommandLine *comma
 
 static void activate(GtkApplication *app, gpointer user_data) {
     (void)user_data;
+    (void)app;
 
     if (main_data) {
         pthread_t thread_id;
@@ -91,29 +92,28 @@ static void activate(GtkApplication *app, gpointer user_data) {
             return;
         }
         load_css_for_screen("styles.css");
-        login_window(app, main_data);
+        login_window(main_data->app, main_data);
     }
 }
 
 int main(int argc, char **argv) {
-    GtkApplication *app;
+    GtkApplication *beeChat;
     int status;
     char app_id[64];
 
     snprintf(app_id, sizeof(app_id), "bee.chat%d", getpid());
     printf("Starting application with ID: %s\n", app_id);
 
-    app = gtk_application_new(app_id, G_APPLICATION_HANDLES_COMMAND_LINE);
-    g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
-    g_signal_connect(app, "command-line", G_CALLBACK(handle_command_line), NULL);
+    beeChat = gtk_application_new(app_id, G_APPLICATION_HANDLES_COMMAND_LINE);
+    g_signal_connect(beeChat, "activate", G_CALLBACK(activate), NULL);
+    g_signal_connect(beeChat, "command-line", G_CALLBACK(handle_command_line), NULL);
 
-    status = g_application_run(G_APPLICATION(app), argc, argv);
+    status = g_application_run(G_APPLICATION(beeChat), argc, argv);
 
     if (main_data) {
         main_data->is_closing = true;
-        mx_free_main_data(main_data);
     }
-
-    g_object_unref(app);
+    mx_free_main_data(main_data);
+    g_object_unref(beeChat);
     return status;
 }

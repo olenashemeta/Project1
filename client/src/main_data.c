@@ -1,6 +1,6 @@
 #include "../inc/client.h"
 
-t_main *mx_create_main_data(const char *address, int port) {
+t_main *mx_create_main_data(GtkApplication *app, const char *address, int port) {
     t_main *main = malloc(sizeof(t_main));
     if (!main) {
         perror("Failed to allocate memory for t_main");
@@ -17,12 +17,8 @@ t_main *mx_create_main_data(const char *address, int port) {
 
     main->port = port;
     main->rec_delay = 5;
-
-    //main->server_response = NULL;
-    //main->has_new_data = false;
-
     main->keys.pkey = NULL;
-
+    main->app = app;
     main->buff = gtk_text_buffer_new(NULL);
     
     if (pthread_mutex_init(&main->lock, NULL) != 0) {

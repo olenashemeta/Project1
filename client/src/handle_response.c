@@ -103,6 +103,8 @@ void handle_login_response(cJSON *json_payload) {
         printf("User login: %s, username: %s, created at: %s, logo_id: %d\n",
                user.login, user.username, user.created_at, user.logo_id);
 
+
+        g_idle_add(gtk_create_main_window, NULL);
         g_idle_add(gtk_destroy_login_window, NULL);
 
         free(user.login);

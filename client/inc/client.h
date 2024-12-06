@@ -46,11 +46,8 @@ typedef struct s_main {
 	pthread_cond_t cond;
 	t_keys keys;
 
+	GtkApplication *app;
 	GtkTextBuffer *buff;
-
-//	bool status;
-//	cJSON *server_response;
-//	bool has_new_data;
 
 }				t_main;
 
@@ -83,7 +80,7 @@ int decrypt_received_data(t_packet *data, const unsigned char *aes_key, const un
 void login_window(GtkApplication *app, gpointer user_data);
 
 //main data func
-t_main *mx_create_main_data(const char *address, int port);
+t_main *mx_create_main_data(GtkApplication *app, const char *address, int port);
 void mx_free_main_data(t_main *main);
 
 //func json request
@@ -131,5 +128,8 @@ void test_base64_encoding(t_main *main_data);
 void update_error_label(GtkWidget *error_label, const char *message);
 gboolean gtk_update_notification_label(gpointer user_data);
 gboolean gtk_destroy_login_window(gpointer data);
+
+
+gboolean gtk_create_main_window(gpointer user_data);
 
 #endif

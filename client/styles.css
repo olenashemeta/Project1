@@ -52,3 +52,43 @@
     font-weight: bold;    
     font-size: 16px;             
 }
+
+#top_bar {
+    background-color: #e4b20d;
+    border: 2px solid #000000;
+    padding: 10px;
+}
+
+#avatar_image {
+    border-radius: 50%;
+    background-color: #cccccc;
+    border: 2px solid orange;
+    margin: 10px;
+}
+
+#chat_entry_box {
+    background-color: #e4b20d;
+    border: 2px solid #000000;
+    padding: 5px;
+}
+
+#chat_entry {
+    background-color: #f5cf28;
+    border: 2px solid #000000;
+    border-radius: 12px;
+    padding: 5px;
+}
+
+/* Цвет боковой панели */
+.side-box {
+    background-color: #e4b20d;
+    border-right: 2px solid #000000;
+}
+
+.message-area {
+    background-image: url('img/back_of_page.svg');
+    background-size: cover; /* Масштабируем, чтобы покрыть всю область */
+    background-repeat: no-repeat; /* Избегаем повторения */
+    background-position: center; /*Центрируем изображение */
+}
+
