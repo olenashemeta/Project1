@@ -92,3 +92,44 @@
     background-position: center; /*Центрируем изображение */
 }
 
+#create-chat-button {
+    background: #d39506;
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;
+    color: white; 
+    border: 2px solid black;
+    border-radius: 15px;
+    padding: 10px 20px; 
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#create-chat-button:hover {
+    background-color: #8d6507;
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;    
+    box-shadow: 0 6px 8px rgba(14, 3, 78, 0.2);  
+}
+#send-button {
+    background: #d39506;
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;
+    color: white; 
+    border: 2px solid black;
+    border-radius: 15px;
+    padding: 10px 20px; 
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#send-button:hover {
+    background-color: #8d6507;
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;    
+    box-shadow: 0 6px 8px rgba(14, 3, 78, 0.2);  
+}
+

@@ -82,11 +82,19 @@ gboolean gtk_create_main_window(gpointer user_data) {
     GtkStyleContext *message_area_context = gtk_widget_get_style_context(message_area);
     gtk_style_context_add_class(message_area_context, "message-area"); // Добавляем CSS-класс
 
+
     /* Контейнер для ввода сообщений */
     chat_entry_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_widget_set_name(chat_entry_box, "chat_entry_box");
     gtk_box_pack_end(GTK_BOX(chat_box), chat_entry_box, FALSE, FALSE, 0);
     //gtk_widget_set_halign(chat_entry_box, GTK_ALIGN_CENTER);
+
+    // Кнопка створення чату
+    GtkWidget *button_create_chat = gtk_button_new();
+    GtkWidget *image_create_chat = create_image("img/addrofa.svg", 20, 15);
+    gtk_button_set_image(GTK_BUTTON(button_create_chat), image_create_chat);
+    gtk_box_pack_start(GTK_BOX(chat_entry_box), button_create_chat, FALSE, FALSE, 0);
+    gtk_widget_set_name(button_create_chat, "create-chat-button");
 
     /* Поле для ввода сообщений */
     chat_entry = gtk_entry_new();
@@ -96,6 +104,17 @@ gboolean gtk_create_main_window(gpointer user_data) {
     gtk_widget_set_halign(chat_entry, GTK_ALIGN_CENTER);
     gtk_box_pack_start(GTK_BOX(chat_entry_box), chat_entry, FALSE, FALSE, 0);
     gtk_widget_set_margin_start(chat_entry, 235);
+
+   
+    // кнопка для відсилання повідомленння
+    GtkWidget *send_button = gtk_button_new();
+    GtkWidget *image_send_button = create_image("img/sendrofa.svg", 20, 15);
+    gtk_button_set_image(GTK_BUTTON(send_button), image_send_button);
+    gtk_box_pack_start(GTK_BOX(chat_entry_box), send_button, FALSE, FALSE, 0);
+    gtk_widget_set_name(send_button, "send-button");
+
+
+
     /* Отображение всех виджетов */
     gtk_widget_show_all(main_window);
 
