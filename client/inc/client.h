@@ -87,7 +87,7 @@ void mx_free_main_data(t_main *main);
 cJSON *form_login_request(const char *login, const char *password);
 cJSON *form_register_request(const char *login, const char *username, const char *password);
 cJSON *form_aes_key_transfer(const unsigned char *aes_key, const unsigned char *iv, EVP_PKEY *pubkey);
-
+cJSON *form_create_chat_with(const char *userlogin);
 
 //Base64
 char *base64_encode(const unsigned char *input, size_t input_len);

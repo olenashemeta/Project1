@@ -60,9 +60,26 @@ cJSON *form_register_request(const char *login, const char *username, const char
     return json_payload;
 }
 
-// cJSON *forn_change_avatar_request() {
+cJSON *form_create_chat_with(const char *userlogin) {
+    cJSON *json_payload = cJSON_CreateObject();
 
-// }
+    if (!json_payload) {    
+        printf("Error creating JSON object\n");
+        return NULL;
+    }
+
+    cJSON_AddStringToObject(json_payload, "request_type", "privateChatCreate");
+
+    unsigned char hash_login[SHA256_DIGEST_LENGTH];
+    SHA256((const unsigned char *)userlogin, strlen(userlogin), hash_login);
+
+    char *hash_login_b64 = base64_encode(hash_login, SHA256_DIGEST_LENGTH);
+    cJSON_AddStringToObject(json_payload, "userlogin", hash_login_b64);
+
+    free(hash_login_b64);
+
+    return json_payload;
+}
 
 cJSON *form_aes_key_transfer(const unsigned char *aes_key, const unsigned char *iv, EVP_PKEY *pubkey) {
     cJSON *json_payload = cJSON_CreateObject();
@@ -102,5 +119,4 @@ cJSON *form_aes_key_transfer(const unsigned char *aes_key, const unsigned char *
 
     return json_payload;
 }
-
 

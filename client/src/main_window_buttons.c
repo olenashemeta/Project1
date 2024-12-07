@@ -49,6 +49,8 @@ void on_private_chat_clicked(GtkButton *button, gpointer user_data) {
     if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
         const char *username = gtk_entry_get_text(GTK_ENTRY(entry));
         g_print("Creating private chat with: %s\n", username);
+        cJSON *createChat_request = form_create_chat_with(username);
+        prepare_and_send_json(createChat_request, main_data);
         // Добавьте здесь логику для создания чата
     }
 
