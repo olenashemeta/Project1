@@ -14,6 +14,4 @@ typedef struct s_bee_user {
 t_bee_user *create_bee_user_from_json(cJSON *data);
 void free_bee_user(t_bee_user *user);
 
-void on_button_create_chat_cliked(void);
-
 #endif

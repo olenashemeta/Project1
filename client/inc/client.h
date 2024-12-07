@@ -131,5 +131,7 @@ gboolean gtk_destroy_login_window(gpointer data);
 
 
 gboolean gtk_create_main_window(gpointer user_data);
+void on_button_create_chat_clicked(GtkButton *button, gpointer user_data);
+void on_private_chat_clicked(GtkButton *button, gpointer user_data);
 
 #endif

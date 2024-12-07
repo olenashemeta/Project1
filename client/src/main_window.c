@@ -98,13 +98,15 @@ gboolean gtk_create_main_window(gpointer user_data) {
     gtk_box_pack_end(GTK_BOX(chat_box), chat_entry_box, FALSE, FALSE, 0);
     //gtk_widget_set_halign(chat_entry_box, GTK_ALIGN_CENTER);
 
-    // Кнопка створення чату
+    // Кнопка создания чата
     GtkWidget *button_create_chat = gtk_button_new();
     GtkWidget *image_create_chat = create_image("img/addrofa.svg", 20, 15);
     gtk_button_set_image(GTK_BUTTON(button_create_chat), image_create_chat);
     gtk_box_pack_start(GTK_BOX(chat_entry_box), button_create_chat, FALSE, FALSE, 0);
     gtk_widget_set_name(button_create_chat, "create-chat-button");
-    g_signal_connect(button_create_chat, "clicked", G_CALLBACK(on_button_create_chat_cliked), main_box);
+
+    // Подключаем обработчик для кнопки
+    g_signal_connect(button_create_chat, "clicked", G_CALLBACK(on_button_create_chat_clicked), main_box);
 
     /* Поле для ввода сообщений */
     chat_entry = gtk_entry_new();

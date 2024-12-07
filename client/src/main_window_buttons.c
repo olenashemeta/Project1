@@ -1,62 +1,56 @@
 #include "../inc/bee_user.h"
 
-void on_button_create_chat_cliked(void) {
-    GtkWidget *dialog = gtk_dialog_new_with_buttons(
-        "Create chat",
-        NULL,
-        GTK_DIALOG_MODAL,
-        "Private chat", GTK_RESPONSE_ACCEPT,
-        NULL
-    );
-    gtk_window_set_default_size(GTK_WINDOW(dialog), 100, 30);
-    gtk_widget_set_name(dialog, "create-chat-dialog");
+void on_button_create_chat_clicked(GtkButton *button, gpointer user_data) {
+    (void)button;
 
-    gint response = gtk_dialog_run(GTK_DIALOG(dialog));
-    gtk_widget_destroy(dialog);
+    GtkWidget *main_box = GTK_WIDGET(user_data);
 
-    if (response == GTK_RESPONSE_ACCEPT) {
-        GtkWidget *name_dialog = gtk_dialog_new_with_buttons(
-            "Search user",
-            NULL,
-            GTK_DIALOG_MODAL,
-            "OK", GTK_RESPONSE_ACCEPT,
-            NULL
-        );
-        gtk_widget_set_name(name_dialog, "search-user-dialog");
+    // Создание поповера
+    GtkWidget *chat_popover = gtk_popover_new(GTK_WIDGET(button));
+    gtk_widget_set_name(chat_popover, "create_chat_popover");
 
-        GtkWidget *user_search_entry = gtk_entry_new();
-        gtk_widget_set_name(user_search_entry, "user-search-entry");
+    GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+    gtk_container_add(GTK_CONTAINER(chat_popover), box);
 
-        GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
-        gtk_widget_set_name(box, "search-entry-box");
+    GtkWidget *private_chat_button = gtk_button_new_with_label("Create Private Chat");
+    gtk_widget_set_name(private_chat_button, "private_chat_button");
+    gtk_box_pack_start(GTK_BOX(box), private_chat_button, FALSE, FALSE, 0);
 
-        gtk_box_pack_start(GTK_BOX(box), user_search_entry, TRUE, TRUE, 0);
+    g_signal_connect(private_chat_button, "clicked", G_CALLBACK(on_private_chat_clicked), main_box);
 
-
-        GtkWidget *content_area = gtk_dialog_get_content_area(GTK_DIALOG(name_dialog));
-        gtk_container_add(GTK_CONTAINER(content_area), box);
-
-        gtk_widget_show_all(name_dialog);
-
-        gint name_response = gtk_dialog_run(GTK_DIALOG(name_dialog));
-
-        const char *search_query = NULL;
-
-        if (name_response == GTK_RESPONSE_ACCEPT) {
-            search_query = gtk_entry_get_text(GTK_ENTRY(user_search_entry));
-
-            if (search_query == NULL || strlen(search_query) == 0) {
-                mx_printerr("Nothing print!!!");
-            } else {
-                mx_printstr("Search person:  ");
-                mx_printstr(search_query);
-                mx_printstr("\n");
-
-                // Perform user search
-            }
-        }
-
-        gtk_widget_destroy(name_dialog);
-    }
+    gtk_widget_show_all(chat_popover);
+    gtk_popover_popup(GTK_POPOVER(chat_popover));
 }
 
+void on_private_chat_clicked(GtkButton *button, gpointer user_data) {
+    (void)button;
+    GtkWidget *main_box = GTK_WIDGET(user_data);
+
+    // Ваша логика для создания приватного чата
+    g_print("Private chat creation triggered.\n");
+
+    // Пример: можно открыть диалог для ввода имени пользователя
+    GtkWidget *dialog = gtk_dialog_new_with_buttons(
+        "Create Private Chat",
+        GTK_WINDOW(gtk_widget_get_toplevel(main_box)),
+        GTK_DIALOG_MODAL,
+        "OK", GTK_RESPONSE_ACCEPT,
+        "Cancel", GTK_RESPONSE_CANCEL,
+        NULL
+    );
+
+    GtkWidget *content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    GtkWidget *entry = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(entry), "Enter username...");
+    gtk_container_add(GTK_CONTAINER(content_area), entry);
+
+    gtk_widget_show_all(dialog);
+
+    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
+        const char *username = gtk_entry_get_text(GTK_ENTRY(entry));
+        g_print("Creating private chat with: %s\n", username);
+        // Добавьте здесь логику для создания чата
+    }
+
+    gtk_widget_destroy(dialog);
+}
