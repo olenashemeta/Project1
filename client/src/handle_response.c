@@ -19,9 +19,9 @@ gboolean gtk_update_notification_label(gpointer user_data) {
     GtkStyleContext *context = gtk_widget_get_style_context(notification_label);
 
     if (status == 1) {
-        //message = "Operation successful";
-        //gtk_style_context_remove_class(context, "error-label");
-        //gtk_style_context_add_class(context, "success-label");
+        message = "Operation successful";
+        gtk_style_context_remove_class(context, "error-label");
+        gtk_style_context_add_class(context, "success-label");
     } else {
         message = "An error occurred";
         gtk_style_context_remove_class(context, "success-label");
