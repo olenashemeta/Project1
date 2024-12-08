@@ -29,6 +29,7 @@ void on_private_chat_clicked(GtkButton *button, gpointer user_data) {
     // Ваша логика для создания приватного чата
     g_print("Private chat creation triggered.\n");
 
+
     // Пример: можно открыть диалог для ввода имени пользователя
     GtkWidget *dialog = gtk_dialog_new_with_buttons(
         "Create Private Chat",
@@ -38,11 +39,13 @@ void on_private_chat_clicked(GtkButton *button, gpointer user_data) {
         "Cancel", GTK_RESPONSE_CANCEL,
         NULL
     );
-
+    gtk_widget_set_name(dialog, "dialog-search-person");
+    
     GtkWidget *content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
     GtkWidget *entry = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(entry), "Enter username...");
     gtk_container_add(GTK_CONTAINER(content_area), entry);
+    gtk_widget_set_name(entry, "entry-search-person");
 
     gtk_widget_show_all(dialog);
 
