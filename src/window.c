@@ -281,6 +281,11 @@ void show_chat_window(GtkApplication *app) {
 
     // Подключаем функцию для выбора файла
     g_signal_connect(file_button, "clicked", G_CALLBACK(on_file_button_clicked), window);
+    
+    GtkWidget *emoji_button = gtk_button_new_with_label("😊");
+    gtk_box_pack_start(GTK_BOX(entry_box), emoji_button, FALSE, FALSE, 5);
+
+    g_signal_connect(emoji_button, "clicked", G_CALLBACK(on_emoji_button_clicked), NULL);
 
     GtkWidget *message_entry = gtk_entry_new();
     GtkWidget *send_button = gtk_button_new_with_label("Send");
@@ -297,7 +302,10 @@ void show_chat_window(GtkApplication *app) {
 
     // Настройки
     fixed = gtk_fixed_new();
+    gtk_widget_set_size_request(fixed, 50, 50);
     gtk_overlay_add_overlay(GTK_OVERLAY(overlay), fixed);
+    
+    gtk_overlay_set_overlay_pass_through(GTK_OVERLAY(overlay), fixed, TRUE);
 
     settings_button = gtk_button_new();
     GtkWidget *icon = gtk_image_new_from_icon_name("preferences-system", GTK_ICON_SIZE_BUTTON);
@@ -310,4 +318,3 @@ void show_chat_window(GtkApplication *app) {
 
     gtk_widget_show_all(window);
 }
-
